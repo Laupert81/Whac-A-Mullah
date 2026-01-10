@@ -10,17 +10,21 @@ import ScorePopup from './ScorePopup'
 import './GameScreen.css'
 
 function GameScreen({ onGameOver }) {
+  // #region agent log
+  fetch('http://127.0.0.1:7244/ingest/e71b2981-833e-45f9-acdf-aacaff2d259e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GameScreen.jsx:12',message:'GameScreen render start',data:{onGameOver:typeof onGameOver},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   const { score, addScore, audioEnabled } = useGame()
   const [isActive, setIsActive] = useState(true)
   const [scorePopups, setScorePopups] = useState([])
   const scorePopupIdRef = useRef(0)
 
-  const { timeRemaining, isWarning, reset: resetTimer } = useGameTimer(
-    isActive,
-    handleTimeUp
-  )
-
+  // #region agent log
+  fetch('http://127.0.0.1:7244/ingest/e71b2981-833e-45f9-acdf-aacaff2d259e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GameScreen.jsx:19',message:'Before handleTimeUp declaration - line number',data:{executionPoint:'before handleTimeUp'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   const handleTimeUp = useCallback(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/e71b2981-833e-45f9-acdf-aacaff2d259e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GameScreen.jsx:21',message:'handleTimeUp callback executing',data:{audioEnabled},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     setIsActive(false)
     audioManager.setEnabled(audioEnabled)
     audioManager.play('game-over')
@@ -28,6 +32,17 @@ function GameScreen({ onGameOver }) {
       onGameOver()
     }, 500)
   }, [onGameOver, audioEnabled])
+  
+  // #region agent log
+  fetch('http://127.0.0.1:7244/ingest/e71b2981-833e-45f9-acdf-aacaff2d259e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GameScreen.jsx:31',message:'After handleTimeUp declaration - before useGameTimer',data:{handleTimeUpType:typeof handleTimeUp},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
+  const { timeRemaining, isWarning, reset: resetTimer } = useGameTimer(
+    isActive,
+    handleTimeUp
+  )
+  // #region agent log
+  fetch('http://127.0.0.1:7244/ingest/e71b2981-833e-45f9-acdf-aacaff2d259e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GameScreen.jsx:35',message:'After useGameTimer call',data:{timeRemaining,isWarning},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
 
   const handleMoleSpawn = useCallback(() => {
     audioManager.setEnabled(audioEnabled)
