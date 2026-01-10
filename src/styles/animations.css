@@ -1,0 +1,77 @@
+/* Mole animations */
+
+@keyframes molePopUp {
+  from {
+    transform: translateY(100%) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes moleHide {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes moleHit {
+  0% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) scale(1.1) rotate(-10deg);
+  }
+  50% {
+    transform: translateY(5px) scale(0.9) rotate(10deg);
+  }
+  75% {
+    transform: translateY(-5px) scale(1.05) rotate(-5deg);
+  }
+  100% {
+    transform: translateY(0) scale(0.3) rotate(0deg);
+    opacity: 0;
+  }
+}
+
+@keyframes scorePop {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes timerPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes holeHighlight {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(52, 152, 219, 0.3);
+  }
+}
+
+/* Reduced motion: disable animations - handled via App.css media query */
+

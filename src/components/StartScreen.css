@@ -1,0 +1,124 @@
+.start-screen {
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  background: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.start-screen__title {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  margin-bottom: 1.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.start-screen__high-score {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--color-background);
+  border-radius: var(--border-radius);
+}
+
+.start-screen__high-score-label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  margin-bottom: 0.5rem;
+}
+
+.start-screen__high-score-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.start-screen__instructions {
+  text-align: left;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--color-background);
+  border-radius: var(--border-radius);
+}
+
+.start-screen__instructions h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+}
+
+.start-screen__instructions ul {
+  list-style: none;
+  padding: 0;
+}
+
+.start-screen__instructions li {
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.start-screen__instructions li::before {
+  content: '• ';
+  color: var(--color-secondary);
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.start-screen__button {
+  width: 100%;
+  max-width: 300px;
+  padding: 1rem 2rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #2980b9 100%);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin: 1rem 0;
+}
+
+.start-screen__button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.start-screen__button:active {
+  transform: translateY(0);
+}
+
+.start-screen__controls {
+  margin-top: 2rem;
+}
+
+@media (max-width: 480px) {
+  .start-screen {
+    padding: 1.5rem;
+  }
+
+  .start-screen__title {
+    font-size: 2.5rem;
+  }
+
+  .start-screen__instructions {
+    padding: 1rem;
+  }
+
+  .start-screen__instructions h2 {
+    font-size: 1.25rem;
+  }
+
+  .start-screen__button {
+    font-size: 1.1rem;
+    padding: 0.875rem 1.5rem;
+  }
+}
+

@@ -1,0 +1,137 @@
+.game-over-screen {
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  background: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.game-over-screen__title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-over-screen__score-section {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.game-over-screen__final-score,
+.game-over-screen__high-score {
+  padding: 1.5rem;
+  background: var(--color-background);
+  border-radius: var(--border-radius);
+  position: relative;
+}
+
+.game-over-screen__label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.game-over-screen__value {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.game-over-screen__new-record {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--color-warning);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.game-over-screen__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.game-over-screen__button {
+  flex: 1;
+  min-width: 150px;
+  max-width: 250px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #2980b9 100%);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.game-over-screen__button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.game-over-screen__button:active {
+  transform: translateY(0);
+}
+
+.game-over-screen__button--primary {
+  background: linear-gradient(135deg, var(--color-success) 0%, #229954 100%);
+}
+
+@media (max-width: 480px) {
+  .game-over-screen {
+    padding: 1.5rem;
+  }
+
+  .game-over-screen__title {
+    font-size: 2.5rem;
+  }
+
+  .game-over-screen__final-score,
+  .game-over-screen__high-score {
+    padding: 1rem;
+  }
+
+  .game-over-screen__value {
+    font-size: 2rem;
+  }
+
+  .game-over-screen__new-record {
+    font-size: 1rem;
+  }
+
+  .game-over-screen__actions {
+    flex-direction: column;
+  }
+
+  .game-over-screen__button {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+

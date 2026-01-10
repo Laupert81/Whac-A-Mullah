@@ -1,0 +1,64 @@
+.mole {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+  transform-origin: center bottom;
+}
+
+.mole__emoji {
+  font-size: clamp(2rem, 8vw, 4rem);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  line-height: 1;
+}
+
+/* Mole types */
+.mole--common {
+  color: var(--mole-common);
+}
+
+.mole--rare {
+  color: var(--mole-rare);
+  filter: brightness(1.1);
+}
+
+.mole--golden {
+  color: var(--mole-golden);
+  filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+  animation: goldenGlow 2s ease-in-out infinite;
+}
+
+@keyframes goldenGlow {
+  0%, 100% {
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+  }
+  50% {
+    filter: brightness(1.4) drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+  }
+}
+
+/* Mole states */
+.mole--active {
+  animation: molePopUp 0.2s ease-out forwards;
+}
+
+.mole--hit {
+  animation: moleHit 0.3s ease-out forwards;
+  pointer-events: none;
+}
+
+/* Hide animation for retreating moles */
+.mole--retreating {
+  animation: moleHide 0.2s ease-in forwards;
+}
+
+@media (max-width: 480px) {
+  .mole__emoji {
+    font-size: clamp(1.5rem, 10vw, 3rem);
+  }
+}
+

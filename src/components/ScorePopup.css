@@ -1,0 +1,42 @@
+.score-popup {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  opacity: 0;
+}
+
+.score-popup--visible {
+  animation: scorePop 0.4s ease-out forwards;
+}
+
+.score-popup__points {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(255, 255, 255, 0.5);
+  line-height: 1;
+}
+
+.score-popup__emoji {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .score-popup__points {
+    font-size: 1.5rem;
+  }
+
+  .score-popup__emoji {
+    font-size: 1.25rem;
+  }
+}
+

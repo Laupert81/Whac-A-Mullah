@@ -1,0 +1,47 @@
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-background);
+  border: 2px solid transparent;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  transition: all 0.2s;
+}
+
+.audio-controls:hover {
+  background: #d5dbdb;
+  border-color: var(--color-secondary);
+}
+
+.audio-controls:active {
+  transform: scale(0.98);
+}
+
+.audio-controls__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.audio-controls__label {
+  font-weight: 500;
+}
+
+.audio-controls--disabled {
+  opacity: 0.7;
+}
+
+@media (max-width: 480px) {
+  .audio-controls {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .audio-controls__icon {
+    font-size: 1.1rem;
+  }
+}
+
