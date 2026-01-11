@@ -5,16 +5,28 @@ import './GameGrid.css'
 
 const TOTAL_HOLES = 9
 
-const GameGrid = memo(({ activeMoles, onMoleHit }) => {
+const GameGrid = memo(({ activeMoles, onMoleHit, onFieldClick }) => {
   const gridRef = useRef(null)
   const holeRefs = useRef([])
 
   const handleClick = useCallback((holeIndex, event) => {
     if (!gridRef.current) return
 
+    // Get click coordinates relative to the game field
+    const fieldBounds = gridRef.current.getBoundingClientRect()
+    const coords = getEventCoordinates(event)
+    const relativeX = coords.x - fieldBounds.left
+    const relativeY = coords.y - fieldBounds.top
+
+    // Trigger hammer animation for any click
+    if (onFieldClick) {
+      onFieldClick(relativeX, relativeY)
+    }
+
+    // Only allow hitting moles that aren't already hit
     const mole = activeMoles.find((m) => m.holeIndex === holeIndex && !m.isHit)
     if (!mole) {
-      // Miss - clicked empty hole
+      // Miss - clicked empty hole or already hit mole
       return
     }
 
@@ -23,20 +35,18 @@ const GameGrid = memo(({ activeMoles, onMoleHit }) => {
     if (!holeElement) return
 
     const bounds = holeElement.getBoundingClientRect()
-    const coords = getEventCoordinates(event)
 
     // Check if click is within mole bounds (use a generous hit area)
     if (isPointInBounds(coords.x, coords.y, bounds)) {
       onMoleHit(holeIndex, mole)
     }
-  }, [activeMoles, onMoleHit])
+  }, [activeMoles, onMoleHit, onFieldClick])
 
   const moleMap = useMemo(() => {
     const map = new Map()
     activeMoles.forEach((mole) => {
-      if (!mole.isHit) {
-        map.set(mole.holeIndex, mole)
-      }
+      // Include all moles (including hit ones) so hit sprites can be displayed
+      map.set(mole.holeIndex, mole)
     })
     return map
   }, [activeMoles])

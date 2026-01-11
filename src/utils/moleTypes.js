@@ -6,7 +6,7 @@ export const MOLE_TYPES = {
 
 export const MOLE_CONFIG = {
   [MOLE_TYPES.COMMON]: {
-    probability: 60,
+    probability: 50,
     points: 100,
     color: '#8B4513', // Brown
     emoji: '🐹',
@@ -20,7 +20,7 @@ export const MOLE_CONFIG = {
     name: 'Rare Mole',
   },
   [MOLE_TYPES.GOLDEN]: {
-    probability: 10,
+    probability: 20,
     points: 500,
     color: '#FFD700', // Gold
     emoji: '✨🐹',

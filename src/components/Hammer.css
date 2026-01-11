@@ -1,0 +1,57 @@
+.hammer {
+  position: absolute;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.hammer__sprite {
+  width: 166px;
+  height: 333px;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  user-select: none;
+  pointer-events: none;
+  display: block;
+  /* Transform origin at top center (handle end at top of sprite) - rotates around the shaft end */
+  transform-origin: 50% 0%;
+}
+
+.hammer--hitting {
+  animation: hammerHitting 0.1s ease-in forwards, hammerFadeOut 0.25s ease-out 0.25s forwards;
+}
+
+@keyframes hammerHitting {
+  0% {
+    opacity: 1;
+    transform: translate(-85%, -65%) scale(1) rotate(-15deg);
+  }
+  100% {
+    transform: translate(-85%, -65%) scale(1.05) rotate(50deg);
+    opacity: 1;
+  }
+}
+
+@keyframes hammerFadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .hammer__sprite {
+    width: 125px;
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hammer__sprite {
+    width: 83px;
+    height: 166px;
+  }
+}
+

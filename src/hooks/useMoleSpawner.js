@@ -152,14 +152,14 @@ export function useMoleSpawner(isActive, onMoleSpawn) {
         retreatTimeoutsRef.current.delete(holeIndex)
       }
 
-      // Remove mole after hit animation
+      // Remove mole after hit animation (400ms animation total)
       setTimeout(() => {
         setActiveMoles((current) => {
           const updated = new Map(current)
           updated.delete(holeIndex)
           return updated
         })
-      }, 300) // Match hit animation duration
+      }, 400) // Match animation duration
 
       return next
     })
