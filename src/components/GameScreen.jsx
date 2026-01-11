@@ -53,10 +53,13 @@ function GameScreen({ onGameOver }) {
 
   const handleMoleHit = useCallback(
     (holeIndex, mole) => {
+      if (!isActive) return
+      
       const hitResult = hitMole(holeIndex)
       if (!hitResult) return
 
-      const points = getMolePoints(mole.type)
+      // Use the hitResult from hitMole, not the mole parameter
+      const points = getMolePoints(hitResult.type)
       addScore(points)
 
       // Play hit sound
@@ -68,7 +71,7 @@ function GameScreen({ onGameOver }) {
       const newPopup = {
         id: popupId,
         points,
-        moleType: mole.type,
+        moleType: hitResult.type,
         holeIndex,
       }
       setScorePopups((prev) => [...prev, newPopup])
@@ -78,16 +81,22 @@ function GameScreen({ onGameOver }) {
         setScorePopups((prev) => prev.filter((p) => p.id !== popupId))
       }, 400)
     },
-    [hitMole, addScore, audioEnabled]
+    [hitMole, addScore, audioEnabled, isActive]
   )
 
-  // Initialize game
+  // Initialize game - run once on mount
   useEffect(() => {
     setIsActive(true)
     resetTimer()
     audioManager.setEnabled(audioEnabled)
     audioManager.play('game-start')
-  }, [resetTimer, audioEnabled])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  
+  // Update audio settings when audioEnabled changes (but don't replay game-start)
+  useEffect(() => {
+    audioManager.setEnabled(audioEnabled)
+  }, [audioEnabled])
 
   // Warning sound for last 10 seconds
   useEffect(() => {

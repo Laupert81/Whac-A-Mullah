@@ -16,8 +16,14 @@ const TOTAL_HOLES = 9
  */
 export function useMoleSpawner(isActive, onMoleSpawn) {
   const [activeMoles, setActiveMoles] = useState(new Map()) // Map<holeIndex, moleData>
+  const activeMolesRef = useRef(activeMoles) // Keep a ref for synchronous access
   const spawnTimeoutRef = useRef(null)
   const retreatTimeoutsRef = useRef(new Map()) // Map<holeIndex, timeout>
+  
+  // Keep the ref in sync with state
+  useEffect(() => {
+    activeMolesRef.current = activeMoles
+  }, [activeMoles])
 
   const getRandomEmptyHole = useCallback((currentMoles) => {
     const occupiedHoles = Array.from(currentMoles.keys())
@@ -119,18 +125,25 @@ export function useMoleSpawner(isActive, onMoleSpawn) {
   }, [isActive, getRandomEmptyHole, onMoleSpawn])
 
   const hitMole = useCallback((holeIndex) => {
-    let hitMoleData = null
+    // Check current state synchronously using ref
+    const mole = activeMolesRef.current.get(holeIndex)
+    if (!mole || mole.isHit) {
+      return null // No mole or already hit
+    }
 
-    // Mark as hit and get mole data
+    // Create a copy of the mole data to return
+    const hitMoleData = { ...mole }
+
+    // Mark as hit in state
     setActiveMoles((prev) => {
-      const mole = prev.get(holeIndex)
-      if (!mole || mole.isHit) {
-        return prev // No mole or already hit
+      const currentMole = prev.get(holeIndex)
+      if (!currentMole || currentMole.isHit) {
+        return prev // Double-check (mole might have been hit in between)
       }
 
-      hitMoleData = { ...mole }
+      const updatedMole = { ...currentMole, isHit: true }
       const next = new Map(prev)
-      next.get(holeIndex).isHit = true
+      next.set(holeIndex, updatedMole)
 
       // Clear retreat timeout
       const retreatTimeout = retreatTimeoutsRef.current.get(holeIndex)
