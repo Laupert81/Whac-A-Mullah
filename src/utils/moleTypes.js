@@ -9,22 +9,19 @@ export const MOLE_CONFIG = {
     probability: 50,
     points: 100,
     color: '#8B4513', // Brown
-    emoji: '🐹',
-    name: 'Common Mole',
+    name: 'Jannati',
   },
   [MOLE_TYPES.RARE]: {
     probability: 30,
     points: 200,
     color: '#4A90E2', // Blue
-    emoji: '🐭',
-    name: 'Rare Mole',
+    name: 'Mohseni-Eje\'i',
   },
   [MOLE_TYPES.GOLDEN]: {
     probability: 20,
     points: 500,
     color: '#FFD700', // Gold
-    emoji: '✨🐹',
-    name: 'Golden Mole',
+    name: 'Khamenei',
   },
 }
 

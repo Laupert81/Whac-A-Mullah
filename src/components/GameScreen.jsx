@@ -129,8 +129,6 @@ function GameScreen({ onGameOver }) {
 
   return (
     <div className="game-screen">
-      <HUD score={score} timeRemaining={timeRemaining} isWarning={isWarning} />
-      
       <div className="game-screen__field">
         <GameGrid 
           activeMoles={activeMoles} 
@@ -151,6 +149,7 @@ function GameScreen({ onGameOver }) {
           />
         ))}
       </div>
+      <HUD score={score} timeRemaining={timeRemaining} isWarning={isWarning} />
     </div>
   )
 }

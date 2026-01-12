@@ -24,12 +24,21 @@ export function isPointInBounds(x, y, bounds) {
  * @returns {Object} - { x, y } coordinates
  */
 export function getEventCoordinates(event) {
+  // For touch events, use changedTouches (more reliable for touchstart)
+  if (event.changedTouches && event.changedTouches.length > 0) {
+    return {
+      x: event.changedTouches[0].clientX,
+      y: event.changedTouches[0].clientY,
+    }
+  }
+  // Fallback to touches for other touch event types
   if (event.touches && event.touches.length > 0) {
     return {
       x: event.touches[0].clientX,
       y: event.touches[0].clientY,
     }
   }
+  // Mouse events
   return {
     x: event.clientX,
     y: event.clientY,

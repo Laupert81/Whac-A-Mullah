@@ -1,38 +1,21 @@
 .game-screen {
-  width: 100%;
-  max-width: 900px;
-  padding: 1rem;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
 }
 
 .game-screen__field {
   position: relative;
   width: 100%;
-  aspect-ratio: 1;
-  max-width: 600px;
-  margin: 0 auto;
-  background: linear-gradient(135deg, #7b4397 0%, #dc2430 100%);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-lg);
+  height: 100%;
+  background-image: url('../assets/sprites/background/game-field.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   overflow: hidden;
-}
-
-@media (max-width: 768px) {
-  .game-screen {
-    padding: 0.5rem;
-    gap: 1rem;
-  }
-
-  .game-screen__field {
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .game-screen__field {
-    aspect-ratio: 1;
-  }
 }
 

@@ -1,4 +1,9 @@
 .hud {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 1rem;
@@ -7,6 +12,7 @@
   background: var(--color-surface);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
+  max-width: 90%;
 }
 
 .hud__score,
@@ -64,9 +70,10 @@
   min-width: 50px;
 }
 
-.hud__legend-emoji {
-  font-size: 1.25rem;
-  line-height: 1;
+.hud__legend-sprite {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .hud__legend-points {
@@ -114,8 +121,9 @@
     padding: 0.375rem;
   }
 
-  .hud__legend-emoji {
-    font-size: 1rem;
+  .hud__legend-sprite {
+    width: 24px;
+    height: 24px;
   }
 
   .hud__legend-points {

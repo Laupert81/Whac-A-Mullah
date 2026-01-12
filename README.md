@@ -1,19 +1,20 @@
-# Whac-A-Mole Game
+# Whac-A-Mullah Game
 
-A browser-based Whac-A-Mole game built with React, featuring three unique mole types with different appearance probabilities and point values. The game runs for 60 seconds and supports both desktop (mouse) and mobile/tablet (touch) input.
+A browser-based Whac-A-Mullah game built with React, featuring three unique mullah types with different appearance probabilities and point values. The game runs for 60 seconds and supports both desktop (mouse) and mobile/tablet (touch) input.
 
 ## Features
 
-- 🎮 **Three Mole Types**:
-  - Common Mole (🐹) - 60% probability, 100 points
-  - Rare Mole (🐭) - 30% probability, 200 points
-  - Golden Mole (✨🐹) - 10% probability, 500 points
+- 🎮 **Three Mullah Types**:
+  - Jannati - 50% probability, 100 points
+  - Mohseni-Eje'i - 30% probability, 200 points
+  - Khamenei - 20% probability, 500 points
 
 - ⏱️ **60-Second Gameplay** - Score as many points as possible before time runs out
 - 🎯 **Responsive Design** - Works on desktop, tablet, and mobile devices
 - 🔊 **Audio Feedback** - Placeholder sound effects with mute/unmute toggle
 - 💾 **High Score Tracking** - Persists high scores in localStorage
 - ♿ **Accessibility** - ARIA labels, keyboard support, high contrast mode, screen reader support
+- 🖼️ **Custom Sprites** - Unique character designs for each mullah type
 
 ## Technology Stack
 
@@ -56,25 +57,25 @@ npm run preview
 
 ## Game Mechanics
 
-- **Mole Spawning**: Moles appear randomly in the 3x3 grid
-  - Maximum 3 moles active simultaneously
+- **Mullah Spawning**: Mullahs appear randomly in the 3x3 grid
+  - Maximum 3 mullahs active simultaneously
   - Spawn interval: 600-1200ms (random)
   - Active duration: 800-1500ms (random)
 
-- **Hit Detection**: Click or tap on moles to score points
+- **Hit Detection**: Click or tap on mullahs to score points
 - **Timer**: 60-second countdown with visual warning in final 10 seconds
 - **Scoring**: Points are awarded immediately and displayed with pop-up animations
 
 ## Project Structure
 
 ```
-whac-a-mole/
+whac-a-mullah/
 ├── src/
 │   ├── components/       # React components
 │   │   ├── StartScreen.jsx
 │   │   ├── GameScreen.jsx
 │   │   ├── GameOverScreen.jsx
-│   │   ├── Mole.jsx
+│   │   ├── Mole.jsx          # Mullah character component
 │   │   ├── Hole.jsx
 │   │   ├── GameGrid.jsx
 │   │   ├── HUD.jsx
@@ -82,12 +83,12 @@ whac-a-mole/
 │   │   └── ScorePopup.jsx
 │   ├── hooks/            # Custom React hooks
 │   │   ├── useGameTimer.js
-│   │   ├── useMoleSpawner.js
+│   │   ├── useMoleSpawner.js  # Mullah spawning logic
 │   │   └── useLocalStorage.js
 │   ├── contexts/         # React Context
 │   │   └── GameContext.jsx
 │   ├── utils/            # Utility functions
-│   │   ├── moleTypes.js
+│   │   ├── moleTypes.js      # Mullah type definitions
 │   │   ├── audioManager.js
 │   │   └── hitDetection.js
 │   ├── styles/           # Global styles
@@ -117,7 +118,7 @@ whac-a-mole/
 - High contrast mode support
 - Reduced motion support for animations
 - Minimum 44x44px touch targets for mobile
-- Color-blind friendly mole differentiation (uses emoji + patterns)
+- Color-blind friendly mullah differentiation (uses distinct sprites)
 
 ## Performance
 

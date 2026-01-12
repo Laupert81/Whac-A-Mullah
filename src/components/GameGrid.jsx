@@ -12,8 +12,11 @@ const GameGrid = memo(({ activeMoles, onMoleHit, onFieldClick }) => {
   const handleClick = useCallback((holeIndex, event) => {
     if (!gridRef.current) return
 
-    // Get click coordinates relative to the game field
-    const fieldBounds = gridRef.current.getBoundingClientRect()
+    // Get click coordinates relative to the field container (where hammer is positioned)
+    const fieldContainer = gridRef.current.parentElement
+    if (!fieldContainer) return
+    
+    const fieldBounds = fieldContainer.getBoundingClientRect()
     const coords = getEventCoordinates(event)
     const relativeX = coords.x - fieldBounds.left
     const relativeY = coords.y - fieldBounds.top
@@ -56,7 +59,7 @@ const GameGrid = memo(({ activeMoles, onMoleHit, onFieldClick }) => {
       ref={gridRef}
       className="game-grid"
       role="application"
-      aria-label="Whac-A-Mole game field"
+      aria-label="Whac-A-Mullah game field"
     >
       {Array.from({ length: TOTAL_HOLES }, (_, index) => (
         <div

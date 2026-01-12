@@ -70,6 +70,23 @@
   margin-right: 0.5rem;
 }
 
+.start-screen__mole-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.start-screen__mole-info::before {
+  content: none;
+}
+
+.start-screen__mole-sprite {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .start-screen__button {
   width: 100%;
   max-width: 300px;

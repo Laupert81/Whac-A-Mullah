@@ -35,7 +35,7 @@ const Mole = memo(({ type, isHit, onAnimationEnd }) => {
     <div
       className={`mole mole--${type} ${isHit ? 'mole--hit' : 'mole--active'}`}
       role="img"
-      aria-label={`${config.name} mole`}
+      aria-label={config.name}
       onAnimationEnd={onAnimationEnd}
     >
       <img

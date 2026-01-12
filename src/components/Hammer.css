@@ -24,10 +24,10 @@
 @keyframes hammerHitting {
   0% {
     opacity: 1;
-    transform: translate(-85%, -65%) scale(1) rotate(-15deg);
+    transform: translate(-70%, -100%) scale(1) rotate(-15deg);
   }
   100% {
-    transform: translate(-85%, -65%) scale(1.05) rotate(50deg);
+    transform: translate(-75%, -100%) scale(1.05) rotate(50deg);
     opacity: 1;
   }
 }
