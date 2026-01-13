@@ -1,5 +1,6 @@
 import { useGame } from '../contexts/GameContext'
 import { MOLE_CONFIG, MOLE_TYPES } from '../utils/moleTypes'
+import { usePWAInstall } from '../hooks/usePWAInstall'
 import AudioControls from './AudioControls'
 import './StartScreen.css'
 
@@ -10,9 +11,14 @@ import moleGolden from '../assets/sprites/moles/golden/mole-golden.png'
 
 function StartScreen({ onStart }) {
   const { highScore, audioEnabled, toggleAudio } = useGame()
+  const { isInstallable, install } = usePWAInstall()
 
   const handleStart = () => {
     onStart()
+  }
+
+  const handleInstall = async () => {
+    await install()
   }
 
   return (
@@ -54,6 +60,16 @@ function StartScreen({ onStart }) {
         >
           Start Game
         </button>
+
+        {isInstallable && (
+          <button
+            className="start-screen__button start-screen__button--install"
+            onClick={handleInstall}
+            aria-label="Install app"
+          >
+            📱 Install App
+          </button>
+        )}
 
         <div className="start-screen__controls">
           <AudioControls audioEnabled={audioEnabled} onToggle={toggleAudio} />

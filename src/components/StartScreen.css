@@ -112,6 +112,15 @@
   transform: translateY(0);
 }
 
+.start-screen__button--install {
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+  margin-top: 0.5rem;
+}
+
+.start-screen__button--install:hover {
+  background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+}
+
 .start-screen__controls {
   margin-top: 2rem;
 }
