@@ -2,11 +2,19 @@
  * Audio Manager for handling game sounds
  * Uses Web Audio API for placeholder sounds if files are not provided
  */
+
+// Import hit sound files - update these paths after moving your audio files
+// Move Audio 1.mp3, Audio 2.mp3, Audio 3.mp3 from root to src/assets/sounds/
+import hitSound1 from '../assets/sounds/hit-1.mp3'
+import hitSound2 from '../assets/sounds/hit-2.mp3'
+import hitSound3 from '../assets/sounds/hit-3.mp3'
+
 class AudioManager {
   constructor() {
     this.enabled = true
     this.audioContext = null
     this.sounds = new Map()
+    this.hitSounds = [] // Array to store multiple hit sound variations
     this.initAudioContext()
   }
 
@@ -56,6 +64,17 @@ class AudioManager {
     // Resume audio context if suspended (required for autoplay policies)
     if (this.audioContext && this.audioContext.state === 'suspended') {
       this.audioContext.resume()
+    }
+
+    // Special handling for hit sounds - randomly select from array
+    if (soundName === 'hit' && this.hitSounds.length > 0) {
+      const randomIndex = Math.floor(Math.random() * this.hitSounds.length)
+      const audio = this.hitSounds[randomIndex]
+      audio.currentTime = 0
+      audio.play().catch((error) => {
+        console.warn(`Could not play hit sound:`, error)
+      })
+      return
     }
 
     // Try to play actual audio file if loaded
@@ -111,8 +130,22 @@ class AudioManager {
       this.sounds.set(name, audio)
     })
   }
+
+  /**
+   * Preload hit sound variations
+   * @param {Array<string>} hitSoundPaths - Array of file paths for hit sounds
+   */
+  preloadHitSounds(hitSoundPaths) {
+    this.hitSounds = hitSoundPaths.map((path) => {
+      const audio = new Audio(path)
+      audio.preload = 'auto'
+      return audio
+    })
+  }
 }
 
 // Singleton instance
 export const audioManager = new AudioManager()
 
+// Initialize hit sounds - preload all three variations
+audioManager.preloadHitSounds([hitSound1, hitSound2, hitSound3])
