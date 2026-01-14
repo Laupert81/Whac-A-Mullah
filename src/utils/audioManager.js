@@ -9,11 +9,18 @@ import hitSound1 from '../assets/sounds/hit-1.mp3'
 import hitSound2 from '../assets/sounds/hit-2.mp3'
 import hitSound3 from '../assets/sounds/hit-3.mp3'
 
+// Import victory music
+import victoryMusic from '../assets/victory/victory-music.mp3'
+
 class AudioManager {
   constructor() {
     this.enabled = true
     this.audioContext = null
     this.sounds = new Map()
+    this.music = new Map() // For background music tracks
+    this.currentMusic = null // Currently playing music
+    this.currentMusicName = null // Name of currently playing track
+    this.fadeInterval = null // Track ongoing fade to cancel if needed
     this.hitSounds = [] // Array to store multiple hit sound variations
     this.initAudioContext()
   }
@@ -142,6 +149,112 @@ class AudioManager {
       return audio
     })
   }
+
+  /**
+   * Preload music tracks
+   * @param {Object} musicMap - Map of music names to file paths
+   */
+  preloadMusic(musicMap) {
+    Object.entries(musicMap).forEach(([name, path]) => {
+      const audio = new Audio(path)
+      audio.preload = 'auto'
+      audio.loop = false // Can be set to true for looping music
+      this.music.set(name, audio)
+    })
+  }
+
+  /**
+   * Play a music track
+   * @param {string} musicName - Name of the music track
+   * @param {Object} options - Options like loop, volume
+   */
+  playMusic(musicName, options = {}) {
+    if (!this.enabled) return
+
+    // Cancel any ongoing fade
+    if (this.fadeInterval) {
+      clearInterval(this.fadeInterval)
+      this.fadeInterval = null
+    }
+
+    const audio = this.music.get(musicName)
+    if (!audio) {
+      console.warn(`Music not found: ${musicName}`)
+      return
+    }
+
+    // If the same track is already playing, just ensure volume and don't restart
+    if (this.currentMusic === audio && !audio.paused && this.currentMusicName === musicName) {
+      audio.volume = options.volume !== undefined ? options.volume : 0.5
+      return
+    }
+
+    // Stop any currently playing music (different track)
+    this.stopMusic()
+
+    // Resume audio context if suspended
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume()
+    }
+
+    audio.loop = options.loop || false
+    audio.volume = options.volume !== undefined ? options.volume : 0.5
+    audio.currentTime = 0
+    this.currentMusic = audio
+    this.currentMusicName = musicName
+    audio.play().catch((error) => {
+      console.warn(`Could not play music ${musicName}:`, error)
+    })
+  }
+
+  /**
+   * Stop currently playing music
+   */
+  stopMusic() {
+    // Cancel any ongoing fade
+    if (this.fadeInterval) {
+      clearInterval(this.fadeInterval)
+      this.fadeInterval = null
+    }
+
+    if (this.currentMusic) {
+      this.currentMusic.pause()
+      this.currentMusic.currentTime = 0
+      this.currentMusic = null
+      this.currentMusicName = null
+    }
+  }
+
+  /**
+   * Fade out current music
+   * @param {number} duration - Fade duration in ms
+   */
+  fadeOutMusic(duration = 1000) {
+    if (!this.currentMusic) return
+
+    // Cancel any existing fade
+    if (this.fadeInterval) {
+      clearInterval(this.fadeInterval)
+    }
+
+    const audio = this.currentMusic
+    const startVolume = audio.volume
+    const steps = 20
+    const stepDuration = duration / steps
+    const volumeStep = startVolume / steps
+
+    let currentStep = 0
+    this.fadeInterval = setInterval(() => {
+      currentStep++
+      audio.volume = Math.max(0, startVolume - (volumeStep * currentStep))
+      
+      if (currentStep >= steps) {
+        clearInterval(this.fadeInterval)
+        this.fadeInterval = null
+        this.stopMusic()
+      }
+    }, stepDuration)
+  }
 }
 
 // Singleton instance
@@ -149,3 +262,8 @@ export const audioManager = new AudioManager()
 
 // Initialize hit sounds - preload all three variations
 audioManager.preloadHitSounds([hitSound1, hitSound2, hitSound3])
+
+// Initialize victory music
+audioManager.preloadMusic({
+  'victory': victoryMusic
+})

@@ -1,72 +1,151 @@
+/* Game Over Screen - Victory Theme */
 .game-over-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0a0c14;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 100;
+}
+
+/* Dark overlay for readability */
+.game-over-screen__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: 600px;
-  padding: 2rem;
-  background: var(--color-surface);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-lg);
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(10, 12, 20, 0.5) 0%,
+    rgba(10, 12, 20, 0.75) 50%,
+    rgba(10, 12, 20, 0.9) 100%
+  );
+  z-index: 1;
+}
+
+/* Content container */
+.game-over-screen__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 500px;
+  padding: 2.5rem;
   text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+  pointer-events: none;
+}
+
+.game-over-screen__content--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Iranian Flag */
+.game-over-screen__flag-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.game-over-screen__flag {
+  max-width: 180px;
+  width: 100%;
+  height: auto;
+}
+
+/* Header section */
+.game-over-screen__header {
+  margin-bottom: 2rem;
 }
 
 .game-over-screen__title {
-  font-size: 3rem;
-  font-weight: bold;
-  color: var(--color-primary);
-  margin-bottom: 2rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: #8eae7c;
+  margin-bottom: 0.5rem;
+  text-shadow: 
+    0 0 20px rgba(142, 174, 124, 0.5),
+    0 2px 10px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.02em;
 }
 
+.game-over-screen__subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Score section */
 .game-over-screen__score-section {
   margin-bottom: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .game-over-screen__final-score,
 .game-over-screen__high-score {
-  padding: 1.5rem;
-  background: var(--color-background);
-  border-radius: var(--border-radius);
-  position: relative;
+  padding: 1.25rem 1.5rem;
+  background: rgba(10, 15, 26, 0.85);
+  border: 1px solid rgba(142, 174, 124, 0.2);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .game-over-screen__label {
   display: block;
-  font-size: 0.9rem;
-  color: var(--color-text-light);
-  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.4rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.15em;
 }
 
 .game-over-screen__value {
   display: block;
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: var(--color-primary);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #8eae7c;
+  text-shadow: 0 0 15px rgba(142, 174, 124, 0.4);
 }
 
 .game-over-screen__new-record {
   display: block;
   margin-top: 0.75rem;
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: var(--color-warning);
-  animation: pulse 1s ease-in-out infinite;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  animation: pulse-glow 1.5s ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes pulse-glow {
   0%, 100% {
     transform: scale(1);
     opacity: 1;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
   }
   50% {
     transform: scale(1.05);
     opacity: 0.9;
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
   }
 }
 
+/* Action buttons */
 .game-over-screen__actions {
   display: flex;
   gap: 1rem;
@@ -76,40 +155,66 @@
 
 .game-over-screen__button {
   flex: 1;
-  min-width: 150px;
-  max-width: 250px;
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: white;
-  background: linear-gradient(135deg, var(--color-secondary) 0%, #2980b9 100%);
-  border: none;
-  border-radius: var(--border-radius);
+  min-width: 140px;
+  max-width: 200px;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid transparent;
+  border-radius: 6px;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.game-over-screen__button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.game-over-screen__button:active {
-  transform: translateY(0);
+  transition: all 0.2s ease;
 }
 
 .game-over-screen__button--primary {
-  background: linear-gradient(135deg, var(--color-success) 0%, #229954 100%);
+  background: linear-gradient(135deg, #8eae7c 0%, #6b8f5c 100%);
+  color: #0a0c14;
+  border-color: #8eae7c;
+  box-shadow: 0 4px 20px rgba(142, 174, 124, 0.3);
 }
 
+.game-over-screen__button--primary:hover {
+  background: linear-gradient(135deg, #9fc08e 0%, #7da06d 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(142, 174, 124, 0.5);
+}
+
+.game-over-screen__button--primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(142, 174, 124, 0.3);
+}
+
+.game-over-screen__button--secondary {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.game-over-screen__button--secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.game-over-screen__button--secondary:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Responsive */
 @media (max-width: 480px) {
-  .game-over-screen {
+  .game-over-screen__content {
     padding: 1.5rem;
+    margin: 1rem;
   }
 
   .game-over-screen__title {
-    font-size: 2.5rem;
+    font-size: 2rem;
+  }
+
+  .game-over-screen__subtitle {
+    font-size: 0.9rem;
   }
 
   .game-over-screen__final-score,
@@ -118,11 +223,11 @@
   }
 
   .game-over-screen__value {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
 
   .game-over-screen__new-record {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .game-over-screen__actions {
@@ -135,3 +240,22 @@
   }
 }
 
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .game-over-screen__content {
+    transition: opacity 0.3s ease-out;
+    transform: none;
+  }
+
+  .game-over-screen__content--visible {
+    transform: none;
+  }
+
+  .game-over-screen__new-record {
+    animation: none;
+  }
+
+  .game-over-screen__button {
+    transition: none;
+  }
+}
