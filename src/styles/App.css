@@ -49,10 +49,16 @@ body {
 .app {
   width: 100%;
   max-width: 1200px;
-  min-height: calc(100vh - 2rem);
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Allow start screen to take full viewport */
+.app:has(.start-screen) {
+  max-width: none;
+  padding: 0;
 }
 
 /* Accessibility: High contrast mode support */
