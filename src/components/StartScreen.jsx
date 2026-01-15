@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useGame } from '../contexts/GameContext'
 import { MOLE_CONFIG, MOLE_TYPES } from '../utils/moleTypes'
 import { usePWAInstall } from '../hooks/usePWAInstall'
@@ -13,6 +13,107 @@ import moleGolden from '../assets/sprites/moles/golden/mole-golden.png'
 // Import logos (replace .svg with .png when actual logos are provided)
 import gameLogo from '../assets/logos/game-logo.png'
 import studioLogo from '../assets/logos/tabarnak-studios.png'
+
+function HamburgerMenu({ onShowInstructions, onShowAbout }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const menuRef = useRef(null)
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsOpen(false)
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('touchstart', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
+  }, [isOpen])
+
+  const handleItemClick = (action) => {
+    setIsOpen(false)
+    action()
+  }
+
+  return (
+    <div className="hamburger-menu" ref={menuRef}>
+      <button
+        className="hamburger-menu__toggle"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={isOpen}
+      >
+        <span className={`hamburger-menu__bar ${isOpen ? 'hamburger-menu__bar--open' : ''}`}></span>
+        <span className={`hamburger-menu__bar ${isOpen ? 'hamburger-menu__bar--open' : ''}`}></span>
+        <span className={`hamburger-menu__bar ${isOpen ? 'hamburger-menu__bar--open' : ''}`}></span>
+      </button>
+      
+      {isOpen && (
+        <div className="hamburger-menu__dropdown">
+          <button
+            className="hamburger-menu__item"
+            onClick={() => handleItemClick(onShowInstructions)}
+          >
+            Instructions
+          </button>
+          <button
+            className="hamburger-menu__item"
+            onClick={() => handleItemClick(onShowAbout)}
+          >
+            About the game
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AboutModal({ isOpen, onClose }) {
+  if (!isOpen) return null
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content modal-content--about" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Close about">
+          ×
+        </button>
+        <h2 className="modal-title">About the game</h2>
+        <div className="about-text">
+          <p>Please lower your expectations. Lower... okay, there.</p>
+          <p>To be clear: I am not a game developer. By day, I write unglamorous backend code for enterprise software. If this game feels like it was designed by a database administrator... well, you have a keen eye.</p>
+          <p>I built this to learn new tech, but more importantly, show my support for the brave people protesting in Iran.</p>
+          <p>The code is messy, and the art is... what it is. I happily welcome feedback, bug fixes, or contributions (code improvements or assets that don't look like I drew them in MS Paint.)</p>
+        </div>
+        <div className="about-contact">
+          <h3 className="about-contact__title">Get in touch</h3>
+          <a 
+            href="mailto:whac-a-mullah@outlook.com" 
+            className="about-contact__link"
+          >
+            <span className="about-contact__icon">✉</span>
+            whac-a-mullah@outlook.com
+          </a>
+          <a 
+            href="https://github.com/Laupert81/Whac-A-Mullah" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="about-contact__link"
+          >
+            <span className="about-contact__icon">⌨</span>
+            GitHub Project
+          </a>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function InstructionsModal({ isOpen, onClose }) {
   if (!isOpen) return null
@@ -89,6 +190,7 @@ function StartScreen({ onStart }) {
   const { isInstallable, isInstalled, install, needsManualInstall, noPWASupport } = usePWAInstall()
   const [showInstructions, setShowInstructions] = useState(false)
   const [showInstallInstructions, setShowInstallInstructions] = useState(false)
+  const [showAbout, setShowAbout] = useState(false)
 
   const handleStart = () => {
     onStart()
@@ -109,6 +211,12 @@ function StartScreen({ onStart }) {
 
   return (
     <div className="start-screen">
+      {/* Hamburger Menu */}
+      <HamburgerMenu 
+        onShowInstructions={() => setShowInstructions(true)}
+        onShowAbout={() => setShowAbout(true)}
+      />
+      
       <div className="start-screen__content">
         {/* Game Logo */}
         <div className="start-screen__logo-container">
@@ -138,14 +246,6 @@ function StartScreen({ onStart }) {
             aria-label="Start game"
           >
             Start Game
-          </button>
-
-          <button
-            className="start-screen__button start-screen__button--secondary"
-            onClick={() => setShowInstructions(true)}
-            aria-label="View instructions"
-          >
-            Instructions
           </button>
 
           {showDirectInstall && (
@@ -204,6 +304,10 @@ function StartScreen({ onStart }) {
       <InstallInstructionsModal 
         isOpen={showInstallInstructions} 
         onClose={() => setShowInstallInstructions(false)} 
+      />
+      <AboutModal 
+        isOpen={showAbout} 
+        onClose={() => setShowAbout(false)} 
       />
     </div>
   )
