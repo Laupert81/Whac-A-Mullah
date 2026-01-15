@@ -1,6 +1,8 @@
-# Whac-A-Mullah Game
+# Whac-A-Mullah
 
-A browser-based Whac-A-Mullah game built with React, featuring three unique mullah types with different appearance probabilities and point values. The game runs for 60 seconds and supports both desktop (mouse) and mobile/tablet (touch) input.
+A satirical browser-based game in support of Iranian freedom, built with React. Hit mullahs to score points in this Whac-A-Mole parody featuring three unique mullah types with different appearance probabilities and point values. The game runs for 60 seconds and supports both desktop (mouse) and mobile/tablet (touch) input.
+
+**FREE IRAN** 🇮🇷
 
 ## Features
 
@@ -11,17 +13,20 @@ A browser-based Whac-A-Mullah game built with React, featuring three unique mull
 
 - ⏱️ **60-Second Gameplay** - Score as many points as possible before time runs out
 - 🎯 **Responsive Design** - Works on desktop, tablet, and mobile devices
-- 🔊 **Audio Feedback** - Placeholder sound effects with mute/unmute toggle
+- 📲 **Progressive Web App (PWA)** - Installable on mobile and desktop for offline play
+- 🔊 **Sound Effects & Victory Music** - Audio feedback with mute/unmute toggle
 - 💾 **High Score Tracking** - Persists high scores in localStorage
-- ♿ **Accessibility** - ARIA labels, keyboard support, high contrast mode, screen reader support
+- 🔨 **Custom Hammer Cursor** - Animated hammer that follows your cursor/tap
 - 🖼️ **Custom Sprites** - Unique character designs for each mullah type
+- 🏆 **Victory Celebration** - Themed game over screen celebrating your victory
 
 ## Technology Stack
 
 - **React 18** - Component-based UI framework
-- **Vite** - Fast build tool and dev server
+- **Vite 5** - Fast build tool and dev server
+- **vite-plugin-pwa** - Progressive Web App support with service workers
 - **CSS3** - Animations and responsive design
-- **Web Audio API** - Placeholder sound effects
+- **Web Audio API** - Sound effects and music
 
 ## Getting Started
 
@@ -71,32 +76,44 @@ npm run preview
 ```
 whac-a-mullah/
 ├── src/
-│   ├── components/       # React components
+│   ├── assets/
+│   │   ├── logos/           # Game and studio logos
+│   │   ├── sounds/          # Hit sound effects
+│   │   ├── sprites/         # Game graphics
+│   │   │   ├── background/  # Game field background
+│   │   │   ├── hammer/      # Hammer cursor sprites
+│   │   │   ├── holes/       # Hole graphics
+│   │   │   └── moles/       # Mullah sprites (common, rare, golden)
+│   │   └── victory/         # Victory screen assets
+│   ├── components/          # React components
 │   │   ├── StartScreen.jsx
 │   │   ├── GameScreen.jsx
 │   │   ├── GameOverScreen.jsx
-│   │   ├── Mole.jsx          # Mullah character component
+│   │   ├── Mole.jsx         # Mullah character component
 │   │   ├── Hole.jsx
+│   │   ├── Hammer.jsx       # Custom cursor component
 │   │   ├── GameGrid.jsx
 │   │   ├── HUD.jsx
 │   │   ├── AudioControls.jsx
 │   │   └── ScorePopup.jsx
-│   ├── hooks/            # Custom React hooks
+│   ├── hooks/               # Custom React hooks
 │   │   ├── useGameTimer.js
-│   │   ├── useMoleSpawner.js  # Mullah spawning logic
-│   │   └── useLocalStorage.js
-│   ├── contexts/         # React Context
+│   │   ├── useMoleSpawner.js
+│   │   ├── useLocalStorage.js
+│   │   └── usePWAInstall.js
+│   ├── contexts/            # React Context
 │   │   └── GameContext.jsx
-│   ├── utils/            # Utility functions
-│   │   ├── moleTypes.js      # Mullah type definitions
+│   ├── utils/               # Utility functions
+│   │   ├── moleTypes.js     # Mullah type definitions
 │   │   ├── audioManager.js
 │   │   └── hitDetection.js
-│   ├── styles/           # Global styles
+│   ├── styles/              # Global styles
 │   │   ├── App.css
 │   │   └── animations.css
 │   ├── App.jsx
 │   └── main.jsx
-├── public/               # Static assets
+├── public/                  # Static assets (PWA icons, favicon)
+├── docs/                    # Documentation
 ├── index.html
 ├── package.json
 └── vite.config.js
@@ -111,14 +128,13 @@ whac-a-mullah/
 - iOS Safari
 - Android Chrome
 
-## Accessibility Features
+## PWA Installation
 
-- ARIA labels and roles for screen readers
-- Keyboard navigation support
-- High contrast mode support
-- Reduced motion support for animations
-- Minimum 44x44px touch targets for mobile
-- Color-blind friendly mullah differentiation (uses distinct sprites)
+The game can be installed as a Progressive Web App for offline play:
+
+- **Desktop (Chrome/Edge)**: Click the install icon in the address bar
+- **iOS Safari**: Tap Share → "Add to Home Screen"
+- **Android Chrome**: Tap menu (⋮) → "Add to Home screen" or "Install app"
 
 ## Performance
 
@@ -126,8 +142,24 @@ whac-a-mullah/
 - Optimized with React.memo for component re-renders
 - Proper cleanup of timers and intervals
 - GPU-accelerated CSS animations
+- Service worker caching for offline play
+
+## About
+
+This game was created by a backend developer (not a game developer) to learn new tech and show support for the brave people protesting in Iran.
+
+The code may be messy and the art is... what it is. Feedback, bug fixes, and contributions are welcome!
+
+## Contact
+
+- Email: whac-a-mullah@outlook.com
+- GitHub: [Laupert81/Whac-A-Mullah](https://github.com/Laupert81/Whac-A-Mullah)
+
+## Credits
+
+- **Code & Graphics**: A Grumpy Norwegian
+- **Music**: K. Kasyanov
 
 ## License
 
 MIT
-
