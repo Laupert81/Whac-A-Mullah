@@ -99,7 +99,20 @@
   background: linear-gradient(135deg, #333 0%, #222 100%);
   border: 2px solid #555;
   min-width: 60px;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  /* Smooth fade in on mount */
+  animation: comboFadeIn 0.2s ease-out;
+}
+
+@keyframes comboFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .hud__combo--low {

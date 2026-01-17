@@ -1,11 +1,18 @@
-import { memo, useRef, useEffect } from 'react'
+import { memo, useRef } from 'react'
 import Mole from './Mole'
 import './Hole.css'
 
 const Hole = memo(({ holeIndex, mole, onClick }) => {
   const holeRef = useRef(null)
+  const touchHandledRef = useRef(false)
 
   const handleClick = (e) => {
+    // Skip if this click was already handled by touch
+    if (touchHandledRef.current) {
+      touchHandledRef.current = false
+      return
+    }
+    
     if (onClick) {
       onClick(holeIndex, e)
     }
@@ -13,13 +20,26 @@ const Hole = memo(({ holeIndex, mole, onClick }) => {
 
   const handleTouch = (e) => {
     e.preventDefault() // Prevent scrolling
-    handleClick(e)
+    
+    // Mark that we handled this as a touch event
+    touchHandledRef.current = true
+    
+    // Reset the flag after a short delay (in case click doesn't fire)
+    setTimeout(() => {
+      touchHandledRef.current = false
+    }, 300)
+    
+    if (onClick) {
+      onClick(holeIndex, e)
+    }
   }
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
-      handleClick(e)
+      if (onClick) {
+        onClick(holeIndex, e)
+      }
     }
   }
 

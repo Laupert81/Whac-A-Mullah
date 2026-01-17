@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useState, useRef } from 'react'
 import { MOLE_CONFIG, MOLE_TYPES } from '../utils/moleTypes'
 import './HUD.css'
 
@@ -15,17 +15,18 @@ const MOLE_SPRITES = {
 
 const HUD = memo(({ score, timeRemaining, isWarning, combo = 0, comboMultiplier = 1 }) => {
   const [comboAnimating, setComboAnimating] = useState(false)
-  const [prevCombo, setPrevCombo] = useState(0)
+  const prevComboRef = useRef(0)
 
   // Trigger animation when combo increases
   useEffect(() => {
-    if (combo > prevCombo && combo > 0) {
+    if (combo > prevComboRef.current && combo > 0) {
       setComboAnimating(true)
       const timer = setTimeout(() => setComboAnimating(false), 300)
+      prevComboRef.current = combo
       return () => clearTimeout(timer)
     }
-    setPrevCombo(combo)
-  }, [combo, prevCombo])
+    prevComboRef.current = combo
+  }, [combo])
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60)

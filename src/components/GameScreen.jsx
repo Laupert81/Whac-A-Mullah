@@ -19,13 +19,17 @@ function GameScreen({ onGameOver }) {
     comboMultiplier,
     incrementCombo,
     resetCombo,
+    currentMilestone,
+    clearMilestone,
   } = useGame()
   const [isActive, setIsActive] = useState(true)
   const [scorePopups, setScorePopups] = useState([])
   const [hammers, setHammers] = useState([])
-  const [comboPopup, setComboPopup] = useState(null) // For milestone celebrations
+  const [showMilestonePopup, setShowMilestonePopup] = useState(false)
+  const [milestoneValue, setMilestoneValue] = useState(null)
   const scorePopupIdRef = useRef(0)
   const hammerIdRef = useRef(0)
+  const milestoneTimeoutRef = useRef(null)
 
   const handleTimeUp = useCallback(() => {
     setIsActive(false)
@@ -53,7 +57,7 @@ function GameScreen({ onGameOver }) {
 
   const { activeMoles, hitMole } = useMoleSpawner(isActive, handleMoleSpawn)
 
-  const handleFieldClick = useCallback((x, y, hitMole = false) => {
+  const handleFieldClick = useCallback((x, y, didHitMole = false) => {
     // Create a new hammer instance at the click position
     const hammerId = hammerIdRef.current++
     const newHammer = {
@@ -69,7 +73,7 @@ function GameScreen({ onGameOver }) {
     }, 400)
 
     // If clicked on empty space (not a mole), reset combo
-    if (!hitMole && combo > 0) {
+    if (!didHitMole && combo > 0) {
       resetCombo()
       audioManager.setEnabled(audioEnabled)
       audioManager.play('miss')
@@ -116,10 +120,23 @@ function GameScreen({ onGameOver }) {
         // Play appropriate sound
         audioManager.setEnabled(audioEnabled)
         if (milestone) {
+          // Play combo milestone sound
           audioManager.play('combo-milestone')
-          // Show combo milestone popup
-          setComboPopup({ milestone, id: Date.now() })
-          setTimeout(() => setComboPopup(null), 1000)
+          
+          // Show milestone popup
+          setMilestoneValue(milestone)
+          setShowMilestonePopup(true)
+          
+          // Clear any existing timeout
+          if (milestoneTimeoutRef.current) {
+            clearTimeout(milestoneTimeoutRef.current)
+          }
+          
+          // Hide popup after animation
+          milestoneTimeoutRef.current = setTimeout(() => {
+            setShowMilestonePopup(false)
+            clearMilestone()
+          }, 1500)
         } else {
           audioManager.play('hit')
         }
@@ -144,7 +161,7 @@ function GameScreen({ onGameOver }) {
         setScorePopups((prev) => prev.filter((p) => p.id !== popupId))
       }, 400)
     },
-    [hitMole, addScoreWithMultiplier, audioEnabled, isActive, comboMultiplier, combo, incrementCombo, resetCombo]
+    [hitMole, addScoreWithMultiplier, audioEnabled, isActive, comboMultiplier, combo, incrementCombo, resetCombo, clearMilestone]
   )
 
   // Initialize game - run once on mount
@@ -195,10 +212,10 @@ function GameScreen({ onGameOver }) {
         ))}
 
         {/* Combo milestone celebration */}
-        {comboPopup && (
-          <div className="game-screen__combo-popup" key={comboPopup.id}>
+        {showMilestonePopup && milestoneValue && (
+          <div className="game-screen__combo-popup">
             <span className="game-screen__combo-milestone">
-              {comboPopup.milestone}x COMBO!
+              {milestoneValue}x COMBO!
             </span>
           </div>
         )}

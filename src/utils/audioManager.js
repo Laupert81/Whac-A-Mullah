@@ -26,7 +26,10 @@ class AudioManager {
     this.currentMusicName = null // Name of currently playing track
     this.fadeInterval = null // Track ongoing fade to cancel if needed
     this.hitSounds = [] // Array to store multiple hit sound variations
+    this.audioPool = new Map() // Pool of cloned audio elements for concurrent playback
+    this.lastPlayTime = new Map() // Track last play time for debouncing
     this.initAudioContext()
+    this.setupIOSUnlock()
   }
 
   initAudioContext() {
@@ -37,8 +40,39 @@ class AudioManager {
     }
   }
 
+  // iOS requires user interaction to unlock audio
+  setupIOSUnlock() {
+    const unlockAudio = () => {
+      // Resume audio context
+      if (this.audioContext && this.audioContext.state === 'suspended') {
+        this.audioContext.resume()
+      }
+      
+      // Touch all preloaded audio to unlock them on iOS
+      this.sounds.forEach((audio) => {
+        audio.load()
+      })
+      this.hitSounds.forEach((audio) => {
+        audio.load()
+      })
+      
+      // Remove listeners after first interaction
+      document.removeEventListener('touchstart', unlockAudio)
+      document.removeEventListener('touchend', unlockAudio)
+      document.removeEventListener('click', unlockAudio)
+    }
+
+    document.addEventListener('touchstart', unlockAudio, { passive: true })
+    document.addEventListener('touchend', unlockAudio, { passive: true })
+    document.addEventListener('click', unlockAudio, { passive: true })
+  }
+
   setEnabled(enabled) {
     this.enabled = enabled
+    // Resume audio context when enabling
+    if (enabled && this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume()
+    }
   }
 
   /**
@@ -66,6 +100,24 @@ class AudioManager {
   }
 
   /**
+   * Play a cloned audio element (for concurrent playback on iOS)
+   */
+  playCloned(audio, soundName) {
+    // Clone the audio element for concurrent playback
+    const clone = audio.cloneNode()
+    clone.volume = audio.volume
+    
+    // Clean up after playback
+    clone.addEventListener('ended', () => {
+      clone.remove()
+    }, { once: true })
+    
+    clone.play().catch((error) => {
+      console.warn(`Could not play sound ${soundName}:`, error)
+    })
+  }
+
+  /**
    * Play a sound effect
    * @param {string} soundName - Name of the sound (hit, pop, miss, game-start, game-over, tick, highscore)
    */
@@ -77,24 +129,26 @@ class AudioManager {
       this.audioContext.resume()
     }
 
+    // Debounce rapid plays of the same sound (50ms minimum between plays)
+    const now = Date.now()
+    const lastPlay = this.lastPlayTime.get(soundName) || 0
+    if (now - lastPlay < 50) {
+      return
+    }
+    this.lastPlayTime.set(soundName, now)
+
     // Special handling for hit sounds - randomly select from array
     if (soundName === 'hit' && this.hitSounds.length > 0) {
       const randomIndex = Math.floor(Math.random() * this.hitSounds.length)
       const audio = this.hitSounds[randomIndex]
-      audio.currentTime = 0
-      audio.play().catch((error) => {
-        console.warn(`Could not play hit sound:`, error)
-      })
+      this.playCloned(audio, soundName)
       return
     }
 
     // Try to play actual audio file if loaded
     const audio = this.sounds.get(soundName)
     if (audio) {
-      audio.currentTime = 0
-      audio.play().catch((error) => {
-        console.warn(`Could not play sound ${soundName}:`, error)
-      })
+      this.playCloned(audio, soundName)
       return
     }
 

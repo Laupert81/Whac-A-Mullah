@@ -42,27 +42,28 @@ export function GameProvider({ children }) {
   const [combo, setCombo] = useState(0)
   const [comboMultiplier, setComboMultiplier] = useState(1.0)
   const [lastMilestone, setLastMilestone] = useState(0) // Track last celebrated milestone
+  const [currentMilestone, setCurrentMilestone] = useState(null) // Currently triggered milestone
   const comboRef = useRef(0) // For synchronous access in callbacks
 
-  // Increment combo and return whether a milestone was reached
+  // Increment combo and return whether a milestone was reached (sync calculation)
   const incrementCombo = useCallback(() => {
-    let milestoneReached = null
-    setCombo((prev) => {
-      const newCombo = prev + 1
-      comboRef.current = newCombo
-      const newMultiplier = getComboMultiplier(newCombo)
-      setComboMultiplier(newMultiplier)
-      
-      // Check for milestone
-      const milestone = COMBO_MILESTONES.find(m => m === newCombo)
-      if (milestone) {
-        milestoneReached = milestone
-        setLastMilestone(milestone)
-      }
-      
-      return newCombo
-    })
-    return milestoneReached
+    // Calculate synchronously using the ref
+    const newCombo = comboRef.current + 1
+    comboRef.current = newCombo
+    
+    // Check for milestone synchronously
+    const milestone = COMBO_MILESTONES.find(m => m === newCombo)
+    
+    // Update state (async but we don't depend on it for the return value)
+    setCombo(newCombo)
+    setComboMultiplier(getComboMultiplier(newCombo))
+    
+    if (milestone) {
+      setLastMilestone(milestone)
+      setCurrentMilestone(milestone)
+    }
+    
+    return milestone || null
   }, [])
 
   // Reset combo (on miss or penalty hit)
@@ -70,7 +71,13 @@ export function GameProvider({ children }) {
     setCombo(0)
     setComboMultiplier(1.0)
     setLastMilestone(0)
+    setCurrentMilestone(null)
     comboRef.current = 0
+  }, [])
+
+  // Clear current milestone (after showing celebration)
+  const clearMilestone = useCallback(() => {
+    setCurrentMilestone(null)
   }, [])
 
   // Add score with combo multiplier applied
@@ -108,6 +115,7 @@ export function GameProvider({ children }) {
     setCombo(0)
     setComboMultiplier(1.0)
     setLastMilestone(0)
+    setCurrentMilestone(null)
     comboRef.current = 0
     setGameState('playing')
     setPreviousHighScore(highScore)
@@ -118,6 +126,7 @@ export function GameProvider({ children }) {
     setCombo(0)
     setComboMultiplier(1.0)
     setLastMilestone(0)
+    setCurrentMilestone(null)
     comboRef.current = 0
     setGameState('playing')
     setPreviousHighScore(highScore)
@@ -149,12 +158,14 @@ export function GameProvider({ children }) {
     combo,
     comboMultiplier,
     lastMilestone,
+    currentMilestone,
     
     // Actions
     addScore,
     addScoreWithMultiplier,
     incrementCombo,
     resetCombo,
+    clearMilestone,
     resetGame,
     startGame,
     endGame,
