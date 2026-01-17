@@ -3,6 +3,7 @@ import { GameProvider, useGame } from './contexts/GameContext'
 import StartScreen from './components/StartScreen'
 import GameScreen from './components/GameScreen'
 import GameOverScreen from './components/GameOverScreen'
+import UpdateToast from './components/UpdateToast'
 
 function AppContent() {
   const { startGame, resetGame, endGame } = useGame()
@@ -46,6 +47,7 @@ function App() {
   return (
     <GameProvider>
       <AppContent />
+      <UpdateToast />
     </GameProvider>
   )
 }
