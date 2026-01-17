@@ -45,6 +45,15 @@
   }
 }
 
+/* Cat (penalty) mole styling */
+.mole--cat .mole__sprite {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.mole--cat.mole--hit .mole__sprite {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)) saturate(0.5);
+}
+
 /* Mole states */
 .mole--active {
   animation: molePopUp 0.2s ease-out forwards;

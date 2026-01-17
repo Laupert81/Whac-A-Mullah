@@ -2,27 +2,47 @@ export const MOLE_TYPES = {
   COMMON: 'common',
   RARE: 'rare',
   GOLDEN: 'golden',
+  CAT: 'cat',
 }
 
 export const MOLE_CONFIG = {
   [MOLE_TYPES.COMMON]: {
-    probability: 50,
+    probability: 44,
     points: 100,
     color: '#8B4513', // Brown
     name: 'Jannati',
+    isPenalty: false,
   },
   [MOLE_TYPES.RARE]: {
-    probability: 30,
+    probability: 26,
     points: 200,
     color: '#4A90E2', // Blue
     name: 'Mohseni-Eje\'i',
+    isPenalty: false,
   },
   [MOLE_TYPES.GOLDEN]: {
-    probability: 20,
+    probability: 18,
     points: 500,
     color: '#FFD700', // Gold
     name: 'Khamenei',
+    isPenalty: false,
   },
+  [MOLE_TYPES.CAT]: {
+    probability: 12,
+    points: -200,
+    color: '#FF6B6B', // Soft red/coral
+    name: 'Cat',
+    isPenalty: true,
+  },
+}
+
+/**
+ * Check if a mole type is a penalty type
+ * @param {string} moleType - The mole type key
+ * @returns {boolean} Whether hitting this mole is a penalty
+ */
+export function isPenaltyMole(moleType) {
+  return MOLE_CONFIG[moleType]?.isPenalty || false
 }
 
 /**

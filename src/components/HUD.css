@@ -7,7 +7,7 @@
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 1rem;
-  align-items: center;
+  align-items: start;
   padding: 1rem;
   background: var(--color-surface);
   border-radius: var(--border-radius);
@@ -26,6 +26,13 @@
 .hud__score {
   text-align: left;
   align-items: flex-start;
+}
+
+.hud__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .hud__timer {
@@ -82,10 +89,112 @@
   color: var(--color-text);
 }
 
+/* Combo Counter Styles */
+.hud__combo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: calc(var(--border-radius) / 2);
+  background: linear-gradient(135deg, #333 0%, #222 100%);
+  border: 2px solid #555;
+  min-width: 60px;
+  transition: all 0.2s ease;
+}
+
+.hud__combo--low {
+  border-color: #888;
+}
+
+.hud__combo--medium {
+  border-color: #4CAF50;
+  background: linear-gradient(135deg, #1a3d1a 0%, #0d260d 100%);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.hud__combo--high {
+  border-color: #FF9800;
+  background: linear-gradient(135deg, #3d2d0a 0%, #261c06 100%);
+  box-shadow: 0 0 15px rgba(255, 152, 0, 0.4);
+}
+
+.hud__combo--max {
+  border-color: #FFD700;
+  background: linear-gradient(135deg, #3d3200 0%, #262000 100%);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  animation: comboGlow 1s ease-in-out infinite;
+}
+
+.hud__combo--animating {
+  transform: scale(1.15);
+}
+
+.hud__combo-count {
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+}
+
+.hud__combo--medium .hud__combo-count {
+  color: #4CAF50;
+}
+
+.hud__combo--high .hud__combo-count {
+  color: #FF9800;
+}
+
+.hud__combo--max .hud__combo-count {
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.hud__combo-label {
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+}
+
+.hud__combo-multiplier {
+  font-size: 0.75rem;
+  font-weight: 800;
+  margin-top: 0.125rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hud__combo--medium .hud__combo-multiplier {
+  color: #4CAF50;
+  background: rgba(76, 175, 80, 0.2);
+}
+
+.hud__combo--high .hud__combo-multiplier {
+  color: #FF9800;
+  background: rgba(255, 152, 0, 0.2);
+}
+
+.hud__combo--max .hud__combo-multiplier {
+  color: #FFD700;
+  background: rgba(255, 215, 0, 0.2);
+}
+
+@keyframes comboGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+  }
+}
+
 @media (max-width: 768px) {
   .hud {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+    align-items: center;
   }
 
   .hud__score,
@@ -97,6 +206,11 @@
     text-align: center;
   }
 
+  .hud__center {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
   .hud__legend {
     justify-content: center;
     flex-wrap: wrap;
@@ -104,6 +218,20 @@
 
   .hud__value {
     font-size: 1.5rem;
+  }
+
+  .hud__combo {
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .hud__combo-count {
+    font-size: 1.25rem;
+  }
+
+  .hud__combo-label {
+    font-size: 0.5rem;
   }
 }
 

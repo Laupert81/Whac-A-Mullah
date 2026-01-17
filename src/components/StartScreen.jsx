@@ -10,11 +10,15 @@ import moleCommon from '../assets/sprites/moles/common/mole-common.png'
 import moleRare from '../assets/sprites/moles/rare/mole-rare.png'
 import moleGolden from '../assets/sprites/moles/golden/mole-golden.png'
 
+// Cat sprite - imported dynamically, fallback to common if not found
+const catSprites = import.meta.glob('../assets/sprites/moles/cat/*.png', { eager: true, import: 'default' })
+const moleCat = catSprites['../assets/sprites/moles/cat/mole-cat.png'] || moleCommon
+
 // Import logos (replace .svg with .png when actual logos are provided)
 import gameLogo from '../assets/logos/game-logo.png'
 import studioLogo from '../assets/logos/tabarnak-studios.png'
 
-function HamburgerMenu({ onShowInstructions, onShowAbout }) {
+function HamburgerMenu({ onShowInstructions, onShowAbout, onShowChangelog }) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -62,6 +66,12 @@ function HamburgerMenu({ onShowInstructions, onShowAbout }) {
             onClick={() => handleItemClick(onShowInstructions)}
           >
             Instructions
+          </button>
+          <button
+            className="hamburger-menu__item"
+            onClick={() => handleItemClick(onShowChangelog)}
+          >
+            Changelog
           </button>
           <button
             className="hamburger-menu__item"
@@ -139,6 +149,11 @@ function InstructionsModal({ isOpen, onClose }) {
             <img src={moleGolden} alt={MOLE_CONFIG[MOLE_TYPES.GOLDEN].name} className="modal-mole-sprite" />
             <span>{MOLE_CONFIG[MOLE_TYPES.GOLDEN].name} = {MOLE_CONFIG[MOLE_TYPES.GOLDEN].points} points</span>
           </li>
+          <li className="modal-mole-info modal-mole-info--penalty">
+            <img src={moleCat} alt={MOLE_CONFIG[MOLE_TYPES.CAT].name} className="modal-mole-sprite" />
+            <span>{MOLE_CONFIG[MOLE_TYPES.CAT].name} = {MOLE_CONFIG[MOLE_TYPES.CAT].points} points (Don't hit!)</span>
+          </li>
+          <li>Build combos by hitting mullahs consecutively for bonus multipliers!</li>
           <li>Score as many points as possible in 60 seconds!</li>
         </ul>
       </div>
@@ -185,12 +200,65 @@ function InstallInstructionsModal({ isOpen, onClose }) {
   )
 }
 
+function ChangelogModal({ isOpen, onClose }) {
+  if (!isOpen) return null
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content modal-content--changelog" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Close changelog">
+          ×
+        </button>
+        <h2 className="modal-title">Changelog</h2>
+        <div className="changelog">
+          <div className="changelog__version">
+            <h3 className="changelog__version-title">Version 1.1</h3>
+            <ul className="changelog__list">
+              <li>
+                <strong>Combo System:</strong> Build combos by hitting mullahs consecutively! 
+                Earn multipliers up to 3x for chains of 8+ hits.
+              </li>
+              <li>
+                <strong>Penalty Cat:</strong> Watch out for the innocent cat! 
+                Hitting it costs you 200 points and breaks your combo.
+              </li>
+              <li>
+                <strong>Milestone Celebrations:</strong> Reach 5, 10, 15, 20, or 25 hit combos 
+                for special visual and audio celebrations.
+              </li>
+              <li>
+                <strong>New Sound Effects:</strong> Added sounds for cat appearances, 
+                cat hits, and combo milestones.
+              </li>
+              <li>
+                <strong>Visual Feedback:</strong> Score popups now show multipliers, 
+                and the HUD displays your current combo with color-coded tiers.
+              </li>
+              <li>
+                <strong>Updated Instructions:</strong> How to Play now includes combo 
+                mechanics and the penalty cat.
+              </li>
+            </ul>
+          </div>
+          <div className="changelog__version">
+            <h3 className="changelog__version-title">Version 1.0</h3>
+            <ul className="changelog__list">
+              <li>Initial release</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function StartScreen({ onStart }) {
   const { highScore, audioEnabled, toggleAudio } = useGame()
   const { isInstallable, isInstalled, install, needsManualInstall, noPWASupport } = usePWAInstall()
   const [showInstructions, setShowInstructions] = useState(false)
   const [showInstallInstructions, setShowInstallInstructions] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
+  const [showChangelog, setShowChangelog] = useState(false)
 
   const handleStart = () => {
     onStart()
@@ -215,6 +283,7 @@ function StartScreen({ onStart }) {
       <HamburgerMenu 
         onShowInstructions={() => setShowInstructions(true)}
         onShowAbout={() => setShowAbout(true)}
+        onShowChangelog={() => setShowChangelog(true)}
       />
       
       <div className="start-screen__content">
@@ -227,8 +296,8 @@ function StartScreen({ onStart }) {
           />
         </div>
 
-        {/* FREE IRAN text */}
-        <div className="start-screen__slogan">FREE IRAN</div>
+        {/* Version text */}
+        <div className="start-screen__version">Version 1.1</div>
 
         {/* High Score */}
         <div className="start-screen__high-score">
@@ -308,6 +377,10 @@ function StartScreen({ onStart }) {
       <AboutModal 
         isOpen={showAbout} 
         onClose={() => setShowAbout(false)} 
+      />
+      <ChangelogModal 
+        isOpen={showChangelog} 
+        onClose={() => setShowChangelog(false)} 
       />
     </div>
   )

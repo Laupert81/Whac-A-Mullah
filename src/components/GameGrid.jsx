@@ -21,27 +21,25 @@ const GameGrid = memo(({ activeMoles, onMoleHit, onFieldClick }) => {
     const relativeX = coords.x - fieldBounds.left
     const relativeY = coords.y - fieldBounds.top
 
-    // Trigger hammer animation for any click
-    if (onFieldClick) {
-      onFieldClick(relativeX, relativeY)
-    }
-
     // Only allow hitting moles that aren't already hit
     const mole = activeMoles.find((m) => m.holeIndex === holeIndex && !m.isHit)
-    if (!mole) {
-      // Miss - clicked empty hole or already hit mole
-      return
-    }
-
+    
     // Get the hole element to check precise hit bounds
     const holeElement = holeRefs.current[holeIndex]
-    if (!holeElement) return
+    let didHitMole = false
+    
+    if (mole && holeElement) {
+      const bounds = holeElement.getBoundingClientRect()
+      // Check if click is within mole bounds (use a generous hit area)
+      if (isPointInBounds(coords.x, coords.y, bounds)) {
+        didHitMole = true
+        onMoleHit(holeIndex, mole)
+      }
+    }
 
-    const bounds = holeElement.getBoundingClientRect()
-
-    // Check if click is within mole bounds (use a generous hit area)
-    if (isPointInBounds(coords.x, coords.y, bounds)) {
-      onMoleHit(holeIndex, mole)
+    // Trigger hammer animation for any click, pass whether we hit a mole
+    if (onFieldClick) {
+      onFieldClick(relativeX, relativeY, didHitMole)
     }
   }, [activeMoles, onMoleHit, onFieldClick])
 

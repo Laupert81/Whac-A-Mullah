@@ -19,3 +19,65 @@
   overflow: hidden;
 }
 
+/* Combo milestone popup */
+.game-screen__combo-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 200;
+  pointer-events: none;
+  animation: comboPopupAppear 1s ease-out forwards;
+}
+
+.game-screen__combo-milestone {
+  display: block;
+  font-size: 3rem;
+  font-weight: 900;
+  color: #FFD700;
+  text-shadow: 
+    0 0 10px rgba(255, 215, 0, 0.8),
+    0 0 20px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 215, 0, 0.4),
+    2px 2px 0 #000,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+@keyframes comboPopupAppear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5) translateY(-20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .game-screen__combo-milestone {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-screen__combo-milestone {
+    font-size: 1.5rem;
+  }
+}

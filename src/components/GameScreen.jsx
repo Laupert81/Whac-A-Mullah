@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useGame } from '../contexts/GameContext'
 import { useGameTimer } from '../hooks/useGameTimer'
 import { useMoleSpawner } from '../hooks/useMoleSpawner'
-import { getMolePoints } from '../utils/moleTypes'
+import { getMolePoints, isPenaltyMole } from '../utils/moleTypes'
 import { audioManager } from '../utils/audioManager'
 import GameGrid from './GameGrid'
 import HUD from './HUD'
@@ -11,10 +11,19 @@ import Hammer from './Hammer'
 import './GameScreen.css'
 
 function GameScreen({ onGameOver }) {
-  const { score, addScore, audioEnabled } = useGame()
+  const { 
+    score, 
+    addScoreWithMultiplier, 
+    audioEnabled,
+    combo,
+    comboMultiplier,
+    incrementCombo,
+    resetCombo,
+  } = useGame()
   const [isActive, setIsActive] = useState(true)
   const [scorePopups, setScorePopups] = useState([])
   const [hammers, setHammers] = useState([])
+  const [comboPopup, setComboPopup] = useState(null) // For milestone celebrations
   const scorePopupIdRef = useRef(0)
   const hammerIdRef = useRef(0)
 
@@ -32,14 +41,19 @@ function GameScreen({ onGameOver }) {
     handleTimeUp
   )
 
-  const handleMoleSpawn = useCallback(() => {
+  const handleMoleSpawn = useCallback((moleData) => {
     audioManager.setEnabled(audioEnabled)
-    audioManager.play('pop')
+    // Play different sound for cat vs regular moles
+    if (moleData && moleData.type === 'cat') {
+      audioManager.play('cat-appear')
+    } else {
+      audioManager.play('pop')
+    }
   }, [audioEnabled])
 
   const { activeMoles, hitMole } = useMoleSpawner(isActive, handleMoleSpawn)
 
-  const handleFieldClick = useCallback((x, y) => {
+  const handleFieldClick = useCallback((x, y, hitMole = false) => {
     // Create a new hammer instance at the click position
     const hammerId = hammerIdRef.current++
     const newHammer = {
@@ -53,7 +67,14 @@ function GameScreen({ onGameOver }) {
     setTimeout(() => {
       setHammers((prev) => prev.filter((h) => h.id !== hammerId))
     }, 400)
-  }, [])
+
+    // If clicked on empty space (not a mole), reset combo
+    if (!hitMole && combo > 0) {
+      resetCombo()
+      audioManager.setEnabled(audioEnabled)
+      audioManager.play('miss')
+    }
+  }, [combo, resetCombo, audioEnabled])
 
   const handleMoleHit = useCallback(
     (holeIndex, mole) => {
@@ -62,21 +83,59 @@ function GameScreen({ onGameOver }) {
       const hitResult = hitMole(holeIndex)
       if (!hitResult) return
 
-      // Use the hitResult from hitMole, not the mole parameter
-      const points = getMolePoints(hitResult.type)
-      addScore(points)
+      // Check if this is a penalty mole (cat)
+      const isPenalty = isPenaltyMole(hitResult.type)
+      const basePoints = getMolePoints(hitResult.type)
+      
+      let finalPoints = basePoints
+      let currentMultiplier = comboMultiplier
 
-      // Play hit sound
-      audioManager.setEnabled(audioEnabled)
-      audioManager.play('hit')
+      if (isPenalty) {
+        // Penalty mole: reset combo, apply negative points (no multiplier)
+        resetCombo()
+        finalPoints = basePoints // Negative points, no multiplier
+        currentMultiplier = 1
+        
+        // Play cat hit sound
+        audioManager.setEnabled(audioEnabled)
+        audioManager.play('cat-hit')
+      } else {
+        // Regular villain: increment combo, apply multiplier
+        const milestone = incrementCombo()
+        
+        // Get the new multiplier after incrementing
+        // Since state updates are async, we calculate what it will be
+        const newCombo = combo + 1
+        if (newCombo >= 8) currentMultiplier = 3.0
+        else if (newCombo >= 5) currentMultiplier = 2.0
+        else if (newCombo >= 3) currentMultiplier = 1.5
+        else currentMultiplier = 1.0
+        
+        finalPoints = Math.round(basePoints * currentMultiplier)
+        
+        // Play appropriate sound
+        audioManager.setEnabled(audioEnabled)
+        if (milestone) {
+          audioManager.play('combo-milestone')
+          // Show combo milestone popup
+          setComboPopup({ milestone, id: Date.now() })
+          setTimeout(() => setComboPopup(null), 1000)
+        } else {
+          audioManager.play('hit')
+        }
+      }
+
+      // Add score with calculated points
+      addScoreWithMultiplier(basePoints, isPenalty ? 1 : currentMultiplier)
 
       // Show score popup
       const popupId = scorePopupIdRef.current++
       const newPopup = {
         id: popupId,
-        points,
+        points: finalPoints,
         moleType: hitResult.type,
         holeIndex,
+        multiplier: isPenalty ? null : (currentMultiplier > 1 ? currentMultiplier : null),
       }
       setScorePopups((prev) => [...prev, newPopup])
 
@@ -85,7 +144,7 @@ function GameScreen({ onGameOver }) {
         setScorePopups((prev) => prev.filter((p) => p.id !== popupId))
       }, 400)
     },
-    [hitMole, addScore, audioEnabled, isActive]
+    [hitMole, addScoreWithMultiplier, audioEnabled, isActive, comboMultiplier, combo, incrementCombo, resetCombo]
   )
 
   // Initialize game - run once on mount
@@ -131,10 +190,26 @@ function GameScreen({ onGameOver }) {
             points={popup.points}
             moleType={popup.moleType}
             holeIndex={popup.holeIndex}
+            multiplier={popup.multiplier}
           />
         ))}
+
+        {/* Combo milestone celebration */}
+        {comboPopup && (
+          <div className="game-screen__combo-popup" key={comboPopup.id}>
+            <span className="game-screen__combo-milestone">
+              {comboPopup.milestone}x COMBO!
+            </span>
+          </div>
+        )}
       </div>
-      <HUD score={score} timeRemaining={timeRemaining} isWarning={isWarning} />
+      <HUD 
+        score={score} 
+        timeRemaining={timeRemaining} 
+        isWarning={isWarning}
+        combo={combo}
+        comboMultiplier={comboMultiplier}
+      />
     </div>
   )
 }

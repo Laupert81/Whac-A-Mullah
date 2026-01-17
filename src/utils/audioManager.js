@@ -3,11 +3,15 @@
  * Uses Web Audio API for placeholder sounds if files are not provided
  */
 
-// Import hit sound files - update these paths after moving your audio files
-// Move Audio 1.mp3, Audio 2.mp3, Audio 3.mp3 from root to src/assets/sounds/
+// Import hit sound files
 import hitSound1 from '../assets/sounds/hit-1.mp3'
 import hitSound2 from '../assets/sounds/hit-2.mp3'
 import hitSound3 from '../assets/sounds/hit-3.mp3'
+
+// Import cat and combo sounds
+import catAppearSound from '../assets/sounds/cat-appear.mp3'
+import catHitSound from '../assets/sounds/cat-hit.mp3'
+import comboMilestoneSound from '../assets/sounds/combo-milestone.mp3'
 
 // Import victory music
 import victoryMusic from '../assets/victory/victory-music.mp3'
@@ -120,6 +124,24 @@ class AudioManager {
         this.createTone(880, 150)
         setTimeout(() => this.createTone(1100, 150), 150)
         setTimeout(() => this.createTone(1320, 300), 300)
+        break
+      case 'cat-hit':
+        // Sad descending tone for hitting the cat
+        this.createTone(400, 150)
+        setTimeout(() => this.createTone(300, 150), 100)
+        setTimeout(() => this.createTone(200, 200), 200)
+        break
+      case 'cat-appear':
+        // Quick high meow-like sound
+        this.createTone(800, 80)
+        setTimeout(() => this.createTone(1000, 100), 60)
+        break
+      case 'combo-milestone':
+        // Triumphant ascending arpeggio
+        this.createTone(523, 100) // C5
+        setTimeout(() => this.createTone(659, 100), 80) // E5
+        setTimeout(() => this.createTone(784, 100), 160) // G5
+        setTimeout(() => this.createTone(1047, 200), 240) // C6
         break
       default:
         console.warn(`Unknown sound: ${soundName}`)
@@ -262,6 +284,13 @@ export const audioManager = new AudioManager()
 
 // Initialize hit sounds - preload all three variations
 audioManager.preloadHitSounds([hitSound1, hitSound2, hitSound3])
+
+// Initialize cat and combo sounds
+audioManager.preload({
+  'cat-appear': catAppearSound,
+  'cat-hit': catHitSound,
+  'combo-milestone': comboMilestoneSound,
+})
 
 // Initialize victory music
 audioManager.preloadMusic({
