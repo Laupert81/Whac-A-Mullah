@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useRef } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { incrementPlayCount } from '../utils/analytics'
 
 const GameContext = createContext()
 
@@ -130,6 +131,9 @@ export function GameProvider({ children }) {
     comboRef.current = 0
     setGameState('playing')
     setPreviousHighScore(highScore)
+    
+    // Increment global play counter (fire-and-forget)
+    incrementPlayCount()
   }, [highScore])
 
   const endGame = useCallback(() => {

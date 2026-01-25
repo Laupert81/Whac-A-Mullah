@@ -212,6 +212,13 @@ function ChangelogModal({ isOpen, onClose }) {
         <h2 className="modal-title">Changelog</h2>
         <div className="changelog">
           <div className="changelog__version">
+            <h3 className="changelog__version-title">Version 1.1.4</h3>
+            <ul className="changelog__list">
+              <li>Added social media preview cards for better link sharing.</li>
+              <li>Added anonymous gameplay counter.</li>
+            </ul>
+          </div>
+          <div className="changelog__version">
             <h3 className="changelog__version-title">Version 1.1.3</h3>
             <ul className="changelog__list">
               <li>Added new app icons.</li>
@@ -332,7 +339,7 @@ function StartScreen({ onStart }) {
         </div>
 
         {/* Version text */}
-        <div className="start-screen__version">Version 1.1.3</div>
+        <div className="start-screen__version">Version 1.1.4</div>
 
         {/* High Score */}
         <div className="start-screen__high-score">
