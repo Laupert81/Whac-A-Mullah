@@ -21,7 +21,6 @@ function GameScreen({ onGameOver }) {
     comboMultiplier,
     incrementCombo,
     resetCombo,
-    currentMilestone,
     clearMilestone,
     currentLevel,
     levelScore,
