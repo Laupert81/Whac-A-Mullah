@@ -59,7 +59,7 @@ Consecutive hits build multipliers (3-4 hits → 1.5×, 5-7 → 2×, 8+ → 3×)
 
 ### Audio
 
-`src/utils/audioManager.js` is a singleton class using Web Audio API with fallback tones, audio pooling for concurrent playback, and iOS unlock handling. Music tracks (intro, victory) are loaded from external Vercel Blob URLs. Supports `playMusic`/`stopMusic`/`fadeOutMusic`.
+`src/utils/audioManager.js` is a singleton class using Web Audio API with fallback tones, audio pooling for concurrent playback, and iOS unlock handling. Music tracks (intro, victory) are loaded from external Vercel Blob URLs. Supports `playMusic`/`stopMusic`/`fadeOutMusic`. The `play(soundName, options)` method accepts an optional `{ playbackRate }` for pitch shifting (used for combo milestone sounds that increase in pitch with higher multipliers).
 
 ### Leaderboard & Analytics
 

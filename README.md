@@ -133,7 +133,8 @@ whac-a-mullah/
 │   │   ├── useGameTimer.js
 │   │   ├── useMoleSpawner.js
 │   │   ├── useLocalStorage.js
-│   │   └── usePWAInstall.js
+│   │   ├── usePWAInstall.js
+│   │   └── usePWAUpdate.js
 │   ├── contexts/            # React Context
 │   │   └── GameContext.jsx
 │   ├── utils/               # Utility functions
