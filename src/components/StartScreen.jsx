@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useGame } from '../contexts/GameContext'
 import { MOLE_CONFIG, MOLE_TYPES } from '../utils/moleTypes'
 import { usePWAInstall } from '../hooks/usePWAInstall'
@@ -163,8 +163,8 @@ function InstructionsModal({ isOpen, onClose }) {
             <span>{MOLE_CONFIG[MOLE_TYPES.CAT].name} = {MOLE_CONFIG[MOLE_TYPES.CAT].points} points (Don't hit!)</span>
           </li>
           <li>Build combos by hitting mullahs consecutively for bonus multipliers!</li>
-          <li>Each level lasts 45 seconds — meet the score threshold to advance!</li>
-          <li>Difficulty ramps each level: faster moles, more cats, higher thresholds!</li>
+          <li>Each level lasts 30 seconds — meet the score threshold to advance!</li>
+          <li>Difficulty ramps each level: faster moles, higher thresholds!</li>
         </ul>
       </div>
     </div>
@@ -247,8 +247,16 @@ function StartScreen({ onStart }) {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   const replayTimeoutRef = useRef(null)
+  const musicStartedRef = useRef(false)
 
-  // Play intro music, replay after 10s gap when it ends
+  const startIntroMusic = useCallback(() => {
+    if (!audioEnabled || musicStartedRef.current) return
+    musicStartedRef.current = true
+    audioManager.setEnabled(true)
+    audioManager.playMusic('intro', { loop: false, volume: 0.4 })
+  }, [audioEnabled])
+
+  // Set up the ended listener for replay, and try to play on mount
   useEffect(() => {
     const musicAudio = audioManager.music.get('intro')
 
@@ -264,14 +272,39 @@ function StartScreen({ onStart }) {
       scheduleReplay()
     }
 
-    if (audioEnabled) {
-      audioManager.setEnabled(true)
-      audioManager.playMusic('intro', { loop: false, volume: 0.4 })
-    }
-
     if (musicAudio) {
       musicAudio.addEventListener('ended', handleEnded)
     }
+
+    // Try to play immediately (works on desktop, may be blocked on iOS)
+    if (audioEnabled) {
+      audioManager.setEnabled(true)
+      const result = audioManager.music.get('intro')
+      if (result) {
+        result.play().then(() => {
+          musicStartedRef.current = true
+          audioManager.currentMusic = result
+          audioManager.currentMusicName = 'intro'
+          result.volume = 0.4
+        }).catch(() => {
+          // Blocked by autoplay policy — will start on first user interaction
+          musicStartedRef.current = false
+        })
+      }
+    }
+
+    // iOS fallback: start music on first user interaction
+    const onFirstInteraction = () => {
+      if (!musicStartedRef.current && audioEnabled) {
+        musicStartedRef.current = true
+        audioManager.setEnabled(true)
+        audioManager.playMusic('intro', { loop: false, volume: 0.4 })
+      }
+      document.removeEventListener('touchstart', onFirstInteraction)
+      document.removeEventListener('click', onFirstInteraction)
+    }
+    document.addEventListener('touchstart', onFirstInteraction, { once: true, passive: true })
+    document.addEventListener('click', onFirstInteraction, { once: true })
 
     return () => {
       if (replayTimeoutRef.current) {
@@ -280,6 +313,8 @@ function StartScreen({ onStart }) {
       if (musicAudio) {
         musicAudio.removeEventListener('ended', handleEnded)
       }
+      document.removeEventListener('touchstart', onFirstInteraction)
+      document.removeEventListener('click', onFirstInteraction)
       audioManager.stopMusic()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -289,12 +324,14 @@ function StartScreen({ onStart }) {
     audioManager.setEnabled(audioEnabled)
     if (!audioEnabled) {
       audioManager.stopMusic()
+      musicStartedRef.current = false
       if (replayTimeoutRef.current) {
         clearTimeout(replayTimeoutRef.current)
         replayTimeoutRef.current = null
       }
     } else {
       // Resume music if toggled back on
+      musicStartedRef.current = true
       audioManager.playMusic('intro', { loop: false, volume: 0.4 })
     }
   }, [audioEnabled])

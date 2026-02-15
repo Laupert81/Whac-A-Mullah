@@ -154,8 +154,9 @@ function GameScreen({ onGameOver }) {
         // Play appropriate sound
         audioManager.setEnabled(audioEnabled)
         if (milestone) {
-          // Play combo milestone sound
-          audioManager.play('combo-milestone')
+          // Play combo milestone sound (pitch increases with multiplier)
+          const pitchMap = { 1: 1.0, 1.5: 1.08, 2: 1.15, 3: 1.25 }
+          audioManager.play('combo-milestone', { playbackRate: pitchMap[currentMultiplier] || 1.0 })
 
           // Show milestone popup
           setMilestoneValue(milestone)
@@ -193,7 +194,7 @@ function GameScreen({ onGameOver }) {
       // Remove popup after animation
       setTimeout(() => {
         setScorePopups((prev) => prev.filter((p) => p.id !== popupId))
-      }, 400)
+      }, 1200)
     },
     [hitMole, addScoreWithMultiplier, audioEnabled, isActive, comboMultiplier, combo, incrementCombo, resetCombo, clearMilestone, recordHit]
   )

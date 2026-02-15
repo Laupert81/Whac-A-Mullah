@@ -11,11 +11,11 @@
 }
 
 .score-popup--visible {
-  animation: scorePop 0.4s ease-out forwards;
+  animation: scorePop 1s ease-out forwards;
 }
 
 .score-popup--penalty.score-popup--visible {
-  animation: scorePopPenalty 0.5s ease-out forwards;
+  animation: scorePopPenalty 1.2s ease-out forwards;
 }
 
 .score-popup--multiplied .score-popup__points {

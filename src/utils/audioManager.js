@@ -101,17 +101,21 @@ class AudioManager {
 
   /**
    * Play a cloned audio element (for concurrent playback on iOS)
+   * @param {HTMLAudioElement} audio
+   * @param {string} soundName
+   * @param {number} [playbackRate=1] - Pitch/speed multiplier
    */
-  playCloned(audio, soundName) {
+  playCloned(audio, soundName, playbackRate = 1) {
     // Clone the audio element for concurrent playback
     const clone = audio.cloneNode()
     clone.volume = audio.volume
-    
+    clone.playbackRate = playbackRate
+
     // Clean up after playback
     clone.addEventListener('ended', () => {
       clone.remove()
     }, { once: true })
-    
+
     clone.play().catch((error) => {
       console.warn(`Could not play sound ${soundName}:`, error)
     })
@@ -120,8 +124,10 @@ class AudioManager {
   /**
    * Play a sound effect
    * @param {string} soundName - Name of the sound (hit, pop, miss, game-start, game-over, tick, highscore)
+   * @param {Object} [options] - Playback options
+   * @param {number} [options.playbackRate=1] - Pitch/speed multiplier
    */
-  play(soundName) {
+  play(soundName, options = {}) {
     if (!this.enabled) return
 
     // Resume audio context if suspended (required for autoplay policies)
@@ -137,18 +143,20 @@ class AudioManager {
     }
     this.lastPlayTime.set(soundName, now)
 
+    const playbackRate = options.playbackRate || 1
+
     // Special handling for hit sounds - randomly select from array
     if (soundName === 'hit' && this.hitSounds.length > 0) {
       const randomIndex = Math.floor(Math.random() * this.hitSounds.length)
       const audio = this.hitSounds[randomIndex]
-      this.playCloned(audio, soundName)
+      this.playCloned(audio, soundName, playbackRate)
       return
     }
 
     // Try to play actual audio file if loaded
     const audio = this.sounds.get(soundName)
     if (audio) {
-      this.playCloned(audio, soundName)
+      this.playCloned(audio, soundName, playbackRate)
       return
     }
 
