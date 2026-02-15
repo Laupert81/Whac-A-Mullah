@@ -3,6 +3,7 @@ import { useGame } from '../contexts/GameContext'
 import { MOLE_CONFIG, MOLE_TYPES } from '../utils/moleTypes'
 import { usePWAInstall } from '../hooks/usePWAInstall'
 import AudioControls from './AudioControls'
+import changelog from '../data/changelog.json'
 import './StartScreen.css'
 
 // Import mole sprites for instructions
@@ -211,89 +212,16 @@ function ChangelogModal({ isOpen, onClose }) {
         </button>
         <h2 className="modal-title">Changelog</h2>
         <div className="changelog">
-          <div className="changelog__version">
-            <h3 className="changelog__version-title">Version 1.1.5</h3>
-            <ul className="changelog__list">
-              <li>Added Vercel Analytics for usage insights.</li>
-            </ul>
-          </div>
-          <div className="changelog__version">
-            <h3 className="changelog__version-title">Version 1.1.4</h3>
-            <ul className="changelog__list">
-              <li>Added social media preview cards for better link sharing.</li>
-              <li>Added anonymous gameplay counter.</li>
-            </ul>
-          </div>
-          <div className="changelog__version">
-            <h3 className="changelog__version-title">Version 1.1.3</h3>
-            <ul className="changelog__list">
-              <li>Added new app icons.</li>
-            </ul>
-          </div>
-          <div className="changelog__version">
-            <h3 className="changelog__version-title">Version 1.1.2</h3>
-            <ul className="changelog__list">
-              <li>
-                <strong>PWA Updates:</strong> Installed app now prompts to reload when a new version is available.
-              </li>
-            </ul>
-          </div>
-          <div className="changelog__version">
-            <h3 className="changelog__version-title">Version 1.1.1</h3>
-            <ul className="changelog__list">
-              <li>
-                <strong>Mobile Fix:</strong> Fixed combo system not working on touch devices 
-                due to double event firing.
-              </li>
-              <li>
-                <strong>Audio Fix:</strong> Improved sound playback reliability on iOS Safari 
-                with better audio context handling.
-              </li>
-              <li>
-                <strong>Visual Fix:</strong> Fixed combo counter in HUD flickering or 
-                disappearing unexpectedly.
-              </li>
-              <li>
-                <strong>Milestone Popup:</strong> Extended combo milestone celebration 
-                duration and improved animation for better visibility.
-              </li>
-            </ul>
-          </div>
-          <div className="changelog__version">
-            <h3 className="changelog__version-title">Version 1.1</h3>
-            <ul className="changelog__list">
-              <li>
-                <strong>Combo System:</strong> Build combos by hitting mullahs consecutively! 
-                Earn multipliers up to 3x for chains of 8+ hits.
-              </li>
-              <li>
-                <strong>Penalty Cat:</strong> Watch out for the innocent cat! 
-                Hitting it costs you 200 points and breaks your combo.
-              </li>
-              <li>
-                <strong>Milestone Celebrations:</strong> Reach 5, 10, 15, 20, or 25 hit combos 
-                for special visual and audio celebrations.
-              </li>
-              <li>
-                <strong>New Sound Effects:</strong> Added sounds for cat appearances, 
-                cat hits, and combo milestones.
-              </li>
-              <li>
-                <strong>Visual Feedback:</strong> Score popups now show multipliers, 
-                and the HUD displays your current combo with color-coded tiers.
-              </li>
-              <li>
-                <strong>Updated Instructions:</strong> How to Play now includes combo 
-                mechanics and the penalty cat.
-              </li>
-            </ul>
-          </div>
-          <div className="changelog__version">
-            <h3 className="changelog__version-title">Version 1.0</h3>
-            <ul className="changelog__list">
-              <li>Initial release</li>
-            </ul>
-          </div>
+          {changelog.map(entry => (
+            <div className="changelog__version" key={entry.version}>
+              <h3 className="changelog__version-title">Version {entry.version}</h3>
+              <ul className="changelog__list">
+                {entry.changes.map((change, i) => (
+                  <li key={i} dangerouslySetInnerHTML={{ __html: change }} />
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -345,7 +273,7 @@ function StartScreen({ onStart }) {
         </div>
 
         {/* Version text */}
-        <div className="start-screen__version">Version 1.1.5</div>
+        <div className="start-screen__version">Version {changelog[0].version}</div>
 
         {/* High Score */}
         <div className="start-screen__high-score">
