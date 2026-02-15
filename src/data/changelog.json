@@ -1,5 +1,11 @@
 [
   {
+    "version": "1.2.1",
+    "changes": [
+      "Implemented more aggressive update checks for PWA"
+    ]
+  },
+  {
     "version": "1.2",
     "changes": [
       "<strong>Endless Level System:</strong> Game now has infinite levels! Each level lasts 45 seconds — meet the score threshold to advance. Difficulty ramps with faster moles, more cats, and higher targets.",
