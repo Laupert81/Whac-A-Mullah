@@ -26,3 +26,5 @@ dist-ssr
 .env*.local
 
 src/assets/victory/victory-music.mp3
+src/assets/sounds/Amirhossein_Eftekhari-vatan.mp3
+upload.mjs

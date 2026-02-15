@@ -1,20 +1,21 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { selectRandomMoleType } from '../utils/moleTypes'
 
-const MAX_SIMULTANEOUS_MOLES = 3
-const SPAWN_INTERVAL_MIN = 600
-const SPAWN_INTERVAL_MAX = 1200
-const ACTIVE_DURATION_MIN = 800
-const ACTIVE_DURATION_MAX = 1500
+const DEFAULT_MAX_SIMULTANEOUS = 3
+const DEFAULT_SPAWN_MIN = 600
+const DEFAULT_SPAWN_MAX = 1200
+const DEFAULT_ACTIVE_MIN = 800
+const DEFAULT_ACTIVE_MAX = 1500
 const TOTAL_HOLES = 9
 
 /**
  * Custom hook for managing mole spawning
  * @param {boolean} isActive - Whether spawning should be active
  * @param {Function} onMoleSpawn - Callback when mole spawns (moleData)
+ * @param {Object} [difficultyConfig] - Optional difficulty overrides from level config
  * @returns {Object} - { activeMoles, hitMole, spawnMole }
  */
-export function useMoleSpawner(isActive, onMoleSpawn) {
+export function useMoleSpawner(isActive, onMoleSpawn, difficultyConfig) {
   const [activeMoles, setActiveMoles] = useState(new Map()) // Map<holeIndex, moleData>
   const activeMolesRef = useRef(activeMoles) // Keep a ref for synchronous access
   const spawnTimeoutRef = useRef(null)
@@ -22,34 +23,39 @@ export function useMoleSpawner(isActive, onMoleSpawn) {
   const spawnMoleFnRef = useRef(null) // Ref to hold spawnMole for self-scheduling
   const onMoleSpawnRef = useRef(onMoleSpawn) // Ref for callback to avoid recreating spawnMole
   const isActiveRef = useRef(isActive) // Ref for isActive to avoid recreating spawnMole
-  
+  const configRef = useRef(difficultyConfig)
+
   // Keep refs in sync
   useEffect(() => {
     activeMolesRef.current = activeMoles
   }, [activeMoles])
-  
+
   useEffect(() => {
     onMoleSpawnRef.current = onMoleSpawn
   }, [onMoleSpawn])
-  
+
   useEffect(() => {
     isActiveRef.current = isActive
   }, [isActive])
 
+  useEffect(() => {
+    configRef.current = difficultyConfig
+  }, [difficultyConfig])
+
   const getRandomEmptyHole = useCallback((currentMoles) => {
     const occupiedHoles = Array.from(currentMoles.keys())
     const availableHoles = []
-    
+
     for (let i = 0; i < TOTAL_HOLES; i++) {
       if (!occupiedHoles.includes(i)) {
         availableHoles.push(i)
       }
     }
-    
+
     if (availableHoles.length === 0) {
       return null
     }
-    
+
     return availableHoles[Math.floor(Math.random() * availableHoles.length)]
   }, [])
 
@@ -57,8 +63,10 @@ export function useMoleSpawner(isActive, onMoleSpawn) {
     if (spawnTimeoutRef.current) {
       clearTimeout(spawnTimeoutRef.current)
     }
-    const spawnInterval = 
-      Math.random() * (SPAWN_INTERVAL_MAX - SPAWN_INTERVAL_MIN) + SPAWN_INTERVAL_MIN
+    const cfg = configRef.current
+    const sMin = cfg ? cfg.spawnIntervalMin : DEFAULT_SPAWN_MIN
+    const sMax = cfg ? cfg.spawnIntervalMax : DEFAULT_SPAWN_MAX
+    const spawnInterval = Math.random() * (sMax - sMin) + sMin
     spawnTimeoutRef.current = setTimeout(() => {
       // Use ref to get latest spawnMole function
       if (spawnMoleFnRef.current) {
@@ -70,11 +78,14 @@ export function useMoleSpawner(isActive, onMoleSpawn) {
   const spawnMole = useCallback(() => {
     if (!isActiveRef.current) return
 
+    const cfg = configRef.current
+    const maxMoles = cfg ? cfg.maxSimultaneousMoles : DEFAULT_MAX_SIMULTANEOUS
+
     // Check current state synchronously
     const currentMoles = activeMolesRef.current
-    
+
     // Don't spawn if max moles reached
-    if (currentMoles.size >= MAX_SIMULTANEOUS_MOLES) {
+    if (currentMoles.size >= maxMoles) {
       scheduleNextSpawn()
       return
     }
@@ -85,10 +96,17 @@ export function useMoleSpawner(isActive, onMoleSpawn) {
       return
     }
 
+    // Build custom probabilities if config provides catProbability
+    let customProbs = undefined
+    if (cfg && cfg.catProbability != null) {
+      customProbs = { cat: cfg.catProbability }
+    }
+
     // Calculate values OUTSIDE the state updater to avoid StrictMode issues
-    const moleType = selectRandomMoleType()
-    const activeDuration = 
-      Math.random() * (ACTIVE_DURATION_MAX - ACTIVE_DURATION_MIN) + ACTIVE_DURATION_MIN
+    const moleType = selectRandomMoleType(customProbs)
+    const aMin = cfg ? cfg.activeDurationMin : DEFAULT_ACTIVE_MIN
+    const aMax = cfg ? cfg.activeDurationMax : DEFAULT_ACTIVE_MAX
+    const activeDuration = Math.random() * (aMax - aMin) + aMin
     const moleId = `${Date.now()}-${Math.random()}`
     const spawnTime = Date.now()
 
@@ -137,7 +155,7 @@ export function useMoleSpawner(isActive, onMoleSpawn) {
     // Schedule next spawn (outside state updater)
     scheduleNextSpawn()
   }, [getRandomEmptyHole, scheduleNextSpawn])
-  
+
   // Keep the ref in sync with the latest spawnMole
   useEffect(() => {
     spawnMoleFnRef.current = spawnMole
@@ -218,11 +236,11 @@ export function useMoleSpawner(isActive, onMoleSpawn) {
         clearTimeout(spawnTimeoutRef.current)
         spawnTimeoutRef.current = null
       }
-      
+
       // Clear all retreat timeouts
       retreatTimeoutsRef.current.forEach((timeout) => clearTimeout(timeout))
       retreatTimeoutsRef.current.clear()
-      
+
       setActiveMoles(new Map())
     }
   }, [isActive])
@@ -233,4 +251,3 @@ export function useMoleSpawner(isActive, onMoleSpawn) {
     spawnMole,
   }
 }
-

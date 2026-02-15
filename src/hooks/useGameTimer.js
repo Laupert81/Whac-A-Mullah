@@ -1,18 +1,20 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-const INITIAL_TIME = 60 // 60 seconds
+const DEFAULT_DURATION = 60
 
 /**
  * Custom hook for game timer countdown
  * @param {boolean} isActive - Whether the timer should be running
  * @param {Function} onTimeUp - Callback when timer reaches 0
+ * @param {number} [duration] - Duration in seconds (default 60)
  * @returns {Object} - { timeRemaining, isWarning }
  */
-export function useGameTimer(isActive, onTimeUp) {
-  const [timeRemaining, setTimeRemaining] = useState(INITIAL_TIME)
+export function useGameTimer(isActive, onTimeUp, duration = DEFAULT_DURATION) {
+  const [timeRemaining, setTimeRemaining] = useState(duration)
   const intervalRef = useRef(null)
   const onTimeUpRef = useRef(onTimeUp)
   const isActiveRef = useRef(isActive)
+  const durationRef = useRef(duration)
 
   // Keep the refs updated without causing effect re-runs
   useEffect(() => {
@@ -22,6 +24,10 @@ export function useGameTimer(isActive, onTimeUp) {
   useEffect(() => {
     isActiveRef.current = isActive
   }, [isActive])
+
+  useEffect(() => {
+    durationRef.current = duration
+  }, [duration])
 
   useEffect(() => {
     // Clear any existing interval first
@@ -35,7 +41,7 @@ export function useGameTimer(isActive, onTimeUp) {
     }
 
     // Reset timer when activated
-    setTimeRemaining(INITIAL_TIME)
+    setTimeRemaining(durationRef.current)
 
     // Update every 100ms for smooth display
     intervalRef.current = setInterval(() => {
@@ -60,7 +66,7 @@ export function useGameTimer(isActive, onTimeUp) {
 
   // Reset function - restarts the timer if active
   const reset = useCallback(() => {
-    setTimeRemaining(INITIAL_TIME)
+    setTimeRemaining(durationRef.current)
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
       intervalRef.current = null
@@ -89,4 +95,3 @@ export function useGameTimer(isActive, onTimeUp) {
     reset,
   }
 }
-

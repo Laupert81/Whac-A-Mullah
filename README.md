@@ -1,32 +1,48 @@
 # Whac-A-Mullah
 
-A satirical browser-based game in support of Iranian freedom, built with React. Hit mullahs to score points in this Whac-A-Mole parody featuring three unique mullah types with different appearance probabilities and point values. The game runs for 60 seconds and supports both desktop (mouse) and mobile/tablet (touch) input.
+A satirical browser-based game in support of Iranian freedom, built with React. Hit mullahs to score points in this Whac-A-Mole parody featuring three unique mullah types with different appearance probabilities and point values — plus a penalty cat you need to avoid. Progress through endless levels of increasing difficulty, compete on the global leaderboard, and track your personal bests.
 
-**FREE IRAN** 🇮🇷
+**FREE IRAN**
 
 ## Features
 
-- 🎮 **Three Mullah Types**:
-  - Jannati - 50% probability, 100 points
-  - Mohseni-Eje'i - 30% probability, 200 points
-  - Khamenei - 20% probability, 500 points
+- **Four Character Types**:
+  - Jannati (common, 44%) — 100 points
+  - Mohseni-Eje'i (rare, 26%) — 200 points
+  - Khamenei (golden, 18%) — 500 points
+  - Cat (penalty, 12%) — -200 points, breaks combo
 
-- ⏱️ **60-Second Gameplay** - Score as many points as possible before time runs out
-- 🎯 **Responsive Design** - Works on desktop, tablet, and mobile devices
-- 📲 **Progressive Web App (PWA)** - Installable on mobile and desktop for offline play
-- 🔊 **Sound Effects & Victory Music** - Audio feedback with mute/unmute toggle
-- 💾 **High Score Tracking** - Persists high scores in localStorage
-- 🔨 **Custom Hammer Cursor** - Animated hammer that follows your cursor/tap
-- 🖼️ **Custom Sprites** - Unique character designs for each mullah type
-- 🏆 **Victory Celebration** - Themed game over screen celebrating your victory
+- **Endless Level System** — 30-second levels with escalating difficulty. Meet the score threshold to advance to the next level with faster moles, shorter windows, and more simultaneous spawns.
+
+- **Combo System** — Build consecutive hit streaks for score multipliers (1.5x at 3 hits, 2x at 5, 3x at 8+). Milestone celebrations at 5/10/15/20/25 combos.
+
+- **Global Leaderboard** — Top 10 scores tracked via Upstash Redis. Finish in the top 10 to enter your name.
+
+- **Personal Bests** — Best score, accuracy, combo, and highest level tracked across sessions with "New!" badges when records are broken.
+
+- **Game Stats** — Post-game breakdown showing accuracy, max combo, level reached, and moles hit by type.
+
+- **Progressive Web App (PWA)** — Installable on mobile and desktop for offline play.
+
+- **Sound Effects & Music** — Start screen music, in-game audio feedback, victory music, and combo milestone sounds. Mute/unmute toggle.
+
+- **Responsive Design** — Works on desktop, tablet, and mobile devices.
+
+- **Custom Hammer Cursor** — Animated hammer that follows your cursor/tap.
+
+- **Custom Sprites** — Unique character designs for each mullah type and the penalty cat.
+
+- **Victory Celebration** — Themed game over screen with animated flag, stats, and personal bests.
 
 ## Technology Stack
 
-- **React 18** - Component-based UI framework
-- **Vite 5** - Fast build tool and dev server
-- **vite-plugin-pwa** - Progressive Web App support with service workers
-- **CSS3** - Animations and responsive design
-- **Web Audio API** - Sound effects and music
+- **React 18** — Component-based UI with hooks and Context API
+- **Vite 5** — Fast build tool and dev server
+- **vite-plugin-pwa** — Progressive Web App support with Workbox service workers
+- **Upstash Redis** — Global leaderboard and play counter
+- **Vercel Analytics** — Page tracking
+- **CSS3** — Animations, responsive design, CSS custom properties for theming
+- **Web Audio API** — Sound effects and music with iOS unlock handling
 
 ## Getting Started
 
@@ -60,16 +76,30 @@ The built files will be in the `dist` directory. You can preview the production 
 npm run preview
 ```
 
+### Environment Variables (Optional)
+
+For the global leaderboard and play counter:
+
+- `VITE_KV_REST_API_URL` — Upstash Redis REST URL
+- `VITE_KV_REST_API_TOKEN` — Upstash Redis REST token
+
+The game works without these; the leaderboard simply won't be available.
+
 ## Game Mechanics
 
+- **Level System**: Each level lasts 30 seconds. Score enough points to meet the threshold and advance. Threshold scales by 1.3x per level (500, 650, 845, ...).
+
+- **Difficulty Scaling**:
+  - Spawn interval decreases (-30ms min, -50ms max per level)
+  - Active duration decreases (-30ms min, -50ms max per level)
+  - Max simultaneous moles increases (+1 every 3 levels, cap 7)
+
 - **Mullah Spawning**: Mullahs appear randomly in the 3x3 grid
-  - Maximum 3 mullahs active simultaneously
-  - Spawn interval: 600-1200ms (random)
-  - Active duration: 800-1500ms (random)
+  - Spawn interval: 600–1200ms at level 1 (decreases per level)
+  - Active duration: 800–1500ms at level 1 (decreases per level)
 
 - **Hit Detection**: Click or tap on mullahs to score points
-- **Timer**: 60-second countdown with visual warning in final 10 seconds
-- **Scoring**: Points are awarded immediately and displayed with pop-up animations
+- **Scoring**: Points are multiplied by combo multiplier and displayed with pop-up animations
 
 ## Project Structure
 
@@ -83,15 +113,18 @@ whac-a-mullah/
 │   │   │   ├── background/  # Game field background
 │   │   │   ├── hammer/      # Hammer cursor sprites
 │   │   │   ├── holes/       # Hole graphics
-│   │   │   └── moles/       # Mullah sprites (common, rare, golden)
+│   │   │   └── moles/       # Mullah sprites (common, rare, golden, cat)
 │   │   └── victory/         # Victory screen assets
 │   ├── components/          # React components
 │   │   ├── StartScreen.jsx
 │   │   ├── GameScreen.jsx
 │   │   ├── GameOverScreen.jsx
-│   │   ├── Mole.jsx         # Mullah character component
+│   │   ├── LevelTransition.jsx
+│   │   ├── LeaderboardModal.jsx
+│   │   ├── NicknamePrompt.jsx
+│   │   ├── Mole.jsx
 │   │   ├── Hole.jsx
-│   │   ├── Hammer.jsx       # Custom cursor component
+│   │   ├── Hammer.jsx
 │   │   ├── GameGrid.jsx
 │   │   ├── HUD.jsx
 │   │   ├── AudioControls.jsx
@@ -104,10 +137,14 @@ whac-a-mullah/
 │   ├── contexts/            # React Context
 │   │   └── GameContext.jsx
 │   ├── utils/               # Utility functions
+│   │   ├── levelConfig.js   # Level difficulty scaling
 │   │   ├── moleTypes.js     # Mullah type definitions
 │   │   ├── audioManager.js
+│   │   ├── analytics.js     # Leaderboard & play counter
 │   │   └── hitDetection.js
-│   ├── styles/              # Global styles
+│   ├── data/
+│   │   └── changelog.json
+│   ├── styles/
 │   │   ├── App.css
 │   │   └── animations.css
 │   ├── App.jsx
@@ -133,8 +170,8 @@ whac-a-mullah/
 The game can be installed as a Progressive Web App for offline play:
 
 - **Desktop (Chrome/Edge)**: Click the install icon in the address bar
-- **iOS Safari**: Tap Share → "Add to Home Screen"
-- **Android Chrome**: Tap menu (⋮) → "Add to Home screen" or "Install app"
+- **iOS Safari**: Tap Share > "Add to Home Screen"
+- **Android Chrome**: Tap menu > "Add to Home screen" or "Install app"
 
 ## Performance
 
@@ -158,7 +195,7 @@ The code may be messy and the art is... what it is. Feedback, bug fixes, and con
 ## Credits
 
 - **Code & Graphics**: A Grumpy Norwegian
-- **Music**: K. Kasyanov
+- **Music**: Amirhossein Eftekhari, K. Kasyanov
 
 ## License
 

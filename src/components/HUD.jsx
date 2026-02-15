@@ -13,7 +13,7 @@ const MOLE_SPRITES = {
   [MOLE_TYPES.GOLDEN]: moleGolden,
 }
 
-const HUD = memo(({ score, timeRemaining, isWarning, combo = 0, comboMultiplier = 1 }) => {
+const HUD = memo(({ score, timeRemaining, isWarning, combo = 0, comboMultiplier = 1, level = 1, levelProgress = 0 }) => {
   const [comboAnimating, setComboAnimating] = useState(false)
   const prevComboRef = useRef(0)
 
@@ -42,6 +42,8 @@ const HUD = memo(({ score, timeRemaining, isWarning, combo = 0, comboMultiplier 
     return 'low'
   }
 
+  const clampedProgress = Math.min(100, Math.max(0, levelProgress))
+
   return (
     <div className="hud" role="region" aria-label="Game information">
       <div className="hud__score">
@@ -52,6 +54,17 @@ const HUD = memo(({ score, timeRemaining, isWarning, combo = 0, comboMultiplier 
       </div>
 
       <div className="hud__center">
+        {/* Level badge */}
+        <div className="hud__level">
+          <span className="hud__level-badge">Level {level}</span>
+          <div className="hud__level-progress-track">
+            <div
+              className="hud__level-progress-fill"
+              style={{ width: `${clampedProgress}%` }}
+            />
+          </div>
+        </div>
+
         <div className={`hud__timer ${isWarning ? 'hud__timer--warning' : ''}`}>
           <span className="hud__label">Time</span>
           <span className="hud__value" aria-live="polite" aria-atomic="true">
@@ -61,7 +74,7 @@ const HUD = memo(({ score, timeRemaining, isWarning, combo = 0, comboMultiplier 
 
         {/* Combo Counter */}
         {combo > 0 && (
-          <div 
+          <div
             className={`hud__combo hud__combo--${getComboTier()} ${comboAnimating ? 'hud__combo--animating' : ''}`}
             aria-live="polite"
           >
@@ -76,8 +89,8 @@ const HUD = memo(({ score, timeRemaining, isWarning, combo = 0, comboMultiplier 
 
       <div className="hud__legend" aria-label="Mullah types and points">
         <div className="hud__legend-item">
-          <img 
-            src={MOLE_SPRITES[MOLE_TYPES.COMMON]} 
+          <img
+            src={MOLE_SPRITES[MOLE_TYPES.COMMON]}
             alt={MOLE_CONFIG[MOLE_TYPES.COMMON].name}
             className="hud__legend-sprite"
           />
@@ -86,8 +99,8 @@ const HUD = memo(({ score, timeRemaining, isWarning, combo = 0, comboMultiplier 
           </span>
         </div>
         <div className="hud__legend-item">
-          <img 
-            src={MOLE_SPRITES[MOLE_TYPES.RARE]} 
+          <img
+            src={MOLE_SPRITES[MOLE_TYPES.RARE]}
             alt={MOLE_CONFIG[MOLE_TYPES.RARE].name}
             className="hud__legend-sprite"
           />
@@ -96,8 +109,8 @@ const HUD = memo(({ score, timeRemaining, isWarning, combo = 0, comboMultiplier 
           </span>
         </div>
         <div className="hud__legend-item">
-          <img 
-            src={MOLE_SPRITES[MOLE_TYPES.GOLDEN]} 
+          <img
+            src={MOLE_SPRITES[MOLE_TYPES.GOLDEN]}
             alt={MOLE_CONFIG[MOLE_TYPES.GOLDEN].name}
             className="hud__legend-sprite"
           />
@@ -113,4 +126,3 @@ const HUD = memo(({ score, timeRemaining, isWarning, combo = 0, comboMultiplier 
 HUD.displayName = 'HUD'
 
 export default HUD
-

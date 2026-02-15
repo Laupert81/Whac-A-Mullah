@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.2",
+    "changes": [
+      "<strong>Endless Level System:</strong> Game now has infinite levels! Each level lasts 45 seconds — meet the score threshold to advance. Difficulty ramps with faster moles, more cats, and higher targets.",
+      "<strong>Global Leaderboard:</strong> Top 10 scores are now tracked globally. Finish in the top 10 to enter your name!",
+      "<strong>Game Stats:</strong> Game over screen now shows accuracy, max combo, mole breakdown by type, and level reached.",
+      "<strong>Personal Bests:</strong> Your best score, accuracy, combo, and highest level are tracked across sessions with 'New!' badges when you beat a record.",
+      "<strong>HUD Improvements:</strong> Level indicator and score threshold progress bar added to the heads-up display.",
+      "<strong>Start Screen:</strong> Added music (Sorry Mr. Eftekhari, hope it's okay)"
+    ]
+  },
+  {
     "version": "1.1.6",
     "changes": [
       "Moved changelog entries to external file"

@@ -47,18 +47,21 @@ export function isPenaltyMole(moleType) {
 
 /**
  * Selects a random mole type based on probability distribution
+ * @param {Object} [customProbabilities] - Optional overrides, e.g. { cat: 20 }
  * @returns {string} Mole type key
  */
-export function selectRandomMoleType() {
-  // Create weighted array: 60 common, 30 rare, 10 golden (total 100)
+export function selectRandomMoleType(customProbabilities) {
   const pool = []
-  
+
   Object.entries(MOLE_CONFIG).forEach(([type, config]) => {
-    for (let i = 0; i < config.probability; i++) {
+    const prob = customProbabilities && customProbabilities[type] != null
+      ? customProbabilities[type]
+      : config.probability
+    for (let i = 0; i < prob; i++) {
       pool.push(type)
     }
   })
-  
+
   return pool[Math.floor(Math.random() * pool.length)]
 }
 

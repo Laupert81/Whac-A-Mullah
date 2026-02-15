@@ -6,18 +6,20 @@
   width: 100vw;
   height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  overflow-y: auto;
   background-color: #0a0c14;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   z-index: 100;
 }
 
 /* Dark overlay for readability */
 .game-over-screen__overlay {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -29,6 +31,7 @@
     rgba(10, 12, 20, 0.9) 100%
   );
   z-index: 1;
+  pointer-events: none;
 }
 
 /* Content container */
@@ -38,6 +41,7 @@
   width: 100%;
   max-width: 500px;
   padding: 2.5rem;
+  margin: auto 0;
   text-align: center;
   opacity: 0;
   transform: translateY(20px);
@@ -62,6 +66,38 @@
   max-width: 180px;
   width: 100%;
   height: auto;
+  animation: flagWave 3s ease-in-out infinite, flagFloat 5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+@keyframes flagWave {
+  0%, 100% {
+    transform: perspective(400px) rotateX(2deg) rotateY(0deg) skewX(0deg) scaleX(1);
+  }
+  15% {
+    transform: perspective(400px) rotateX(-4deg) rotateY(8deg) skewX(-5deg) scaleX(0.96);
+  }
+  35% {
+    transform: perspective(400px) rotateX(3deg) rotateY(-6deg) skewX(4deg) scaleX(1.02);
+  }
+  55% {
+    transform: perspective(400px) rotateX(-2deg) rotateY(7deg) skewX(-4deg) scaleX(0.97);
+  }
+  75% {
+    transform: perspective(400px) rotateX(4deg) rotateY(-5deg) skewX(3deg) scaleX(1.01);
+  }
+}
+
+@keyframes flagFloat {
+  0%, 100% {
+    translate: 0 0;
+  }
+  30% {
+    translate: 4px -10px;
+  }
+  70% {
+    translate: -3px -8px;
+  }
 }
 
 /* Header section */
@@ -74,7 +110,7 @@
   font-weight: 700;
   color: #8eae7c;
   margin-bottom: 0.5rem;
-  text-shadow: 
+  text-shadow:
     0 0 20px rgba(142, 174, 124, 0.5),
     0 2px 10px rgba(0, 0, 0, 0.8);
   letter-spacing: 0.02em;
@@ -89,7 +125,7 @@
 
 /* Score section */
 .game-over-screen__score-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -143,6 +179,102 @@
     opacity: 0.9;
     text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
   }
+}
+
+/* Stats & Personal Bests sections */
+.game-over-screen__stats-section,
+.game-over-screen__bests-section {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: rgba(10, 15, 26, 0.85);
+  border: 1px solid rgba(142, 174, 124, 0.15);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+}
+
+.game-over-screen__section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.75rem;
+}
+
+.game-over-screen__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+.game-over-screen__stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.game-over-screen__stat-label {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.game-over-screen__stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #8eae7c;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Mole breakdown */
+.game-over-screen__mole-breakdown {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.game-over-screen__mole-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.game-over-screen__mole-sprite {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.game-over-screen__mole-count {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* New! badge */
+.game-over-screen__new-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #ffd700;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 3px;
+  animation: badgePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 /* Action buttons */
@@ -238,6 +370,19 @@
     width: 100%;
     max-width: 100%;
   }
+
+  .game-over-screen__stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .game-over-screen__mole-breakdown {
+    gap: 0.75rem;
+  }
+
+  .game-over-screen__mole-sprite {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 /* Accessibility: Reduced motion */
@@ -251,7 +396,15 @@
     transform: none;
   }
 
+  .game-over-screen__flag {
+    animation: none;
+  }
+
   .game-over-screen__new-record {
+    animation: none;
+  }
+
+  .game-over-screen__new-badge {
     animation: none;
   }
 

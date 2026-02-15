@@ -346,7 +346,10 @@ audioManager.preload({
   'combo-milestone': comboMilestoneSound,
 })
 
-// Initialize victory music
+// Initialize music tracks
+const introMusic = 'https://jhwcs60v8wnkkpkh.public.blob.vercel-storage.com/music/intro-music.mp3'
+
 audioManager.preloadMusic({
-  'victory': victoryMusic
+  'victory': victoryMusic,
+  'intro': introMusic,
 })

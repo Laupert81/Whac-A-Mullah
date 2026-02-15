@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useGame } from '../contexts/GameContext'
 import { MOLE_CONFIG, MOLE_TYPES } from '../utils/moleTypes'
 import { usePWAInstall } from '../hooks/usePWAInstall'
+import { audioManager } from '../utils/audioManager'
 import AudioControls from './AudioControls'
+import LeaderboardModal from './LeaderboardModal'
 import changelog from '../data/changelog.json'
 import './StartScreen.css'
 
@@ -19,7 +21,7 @@ const moleCat = catSprites['../assets/sprites/moles/cat/mole-cat.png'] || moleCo
 import gameLogo from '../assets/logos/game-logo.png'
 import studioLogo from '../assets/logos/tabarnak-studios.png'
 
-function HamburgerMenu({ onShowInstructions, onShowAbout, onShowChangelog }) {
+function HamburgerMenu({ onShowInstructions, onShowAbout, onShowChangelog, onShowLeaderboard }) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -67,6 +69,12 @@ function HamburgerMenu({ onShowInstructions, onShowAbout, onShowChangelog }) {
             onClick={() => handleItemClick(onShowInstructions)}
           >
             Instructions
+          </button>
+          <button
+            className="hamburger-menu__item"
+            onClick={() => handleItemClick(onShowLeaderboard)}
+          >
+            Leaderboard
           </button>
           <button
             className="hamburger-menu__item"
@@ -155,7 +163,8 @@ function InstructionsModal({ isOpen, onClose }) {
             <span>{MOLE_CONFIG[MOLE_TYPES.CAT].name} = {MOLE_CONFIG[MOLE_TYPES.CAT].points} points (Don't hit!)</span>
           </li>
           <li>Build combos by hitting mullahs consecutively for bonus multipliers!</li>
-          <li>Score as many points as possible in 60 seconds!</li>
+          <li>Each level lasts 45 seconds — meet the score threshold to advance!</li>
+          <li>Difficulty ramps each level: faster moles, more cats, higher thresholds!</li>
         </ul>
       </div>
     </div>
@@ -235,8 +244,63 @@ function StartScreen({ onStart }) {
   const [showInstallInstructions, setShowInstallInstructions] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [showChangelog, setShowChangelog] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+
+  const replayTimeoutRef = useRef(null)
+
+  // Play intro music, replay after 10s gap when it ends
+  useEffect(() => {
+    const musicAudio = audioManager.music.get('intro')
+
+    const scheduleReplay = () => {
+      replayTimeoutRef.current = setTimeout(() => {
+        if (audioEnabled) {
+          audioManager.playMusic('intro', { loop: false, volume: 0.4 })
+        }
+      }, 10000)
+    }
+
+    const handleEnded = () => {
+      scheduleReplay()
+    }
+
+    if (audioEnabled) {
+      audioManager.setEnabled(true)
+      audioManager.playMusic('intro', { loop: false, volume: 0.4 })
+    }
+
+    if (musicAudio) {
+      musicAudio.addEventListener('ended', handleEnded)
+    }
+
+    return () => {
+      if (replayTimeoutRef.current) {
+        clearTimeout(replayTimeoutRef.current)
+      }
+      if (musicAudio) {
+        musicAudio.removeEventListener('ended', handleEnded)
+      }
+      audioManager.stopMusic()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Respond to audio toggle while on start screen
+  useEffect(() => {
+    audioManager.setEnabled(audioEnabled)
+    if (!audioEnabled) {
+      audioManager.stopMusic()
+      if (replayTimeoutRef.current) {
+        clearTimeout(replayTimeoutRef.current)
+        replayTimeoutRef.current = null
+      }
+    } else {
+      // Resume music if toggled back on
+      audioManager.playMusic('intro', { loop: false, volume: 0.4 })
+    }
+  }, [audioEnabled])
 
   const handleStart = () => {
+    audioManager.fadeOutMusic(300)
     onStart()
   }
 
@@ -256,10 +320,11 @@ function StartScreen({ onStart }) {
   return (
     <div className="start-screen">
       {/* Hamburger Menu */}
-      <HamburgerMenu 
+      <HamburgerMenu
         onShowInstructions={() => setShowInstructions(true)}
         onShowAbout={() => setShowAbout(true)}
         onShowChangelog={() => setShowChangelog(true)}
+        onShowLeaderboard={() => setShowLeaderboard(true)}
       />
       
       <div className="start-screen__content">
@@ -324,10 +389,10 @@ function StartScreen({ onStart }) {
       <div className="start-screen__credits-container">
         <div className="start-screen__credits-marquee">
           <span className="start-screen__credits-text">
-            Code by a Grumpy Norwegian &nbsp;|&nbsp; Graphics by a Grumpy Norwegian &nbsp;|&nbsp; Sound effects by some guy on the internet (sorry) &nbsp;|&nbsp; Music by K. Kasyanov &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Code by a Grumpy Norwegian &nbsp;|&nbsp; Graphics by a Grumpy Norwegian &nbsp;|&nbsp; Sound effects by some guy on the internet (sorry) &nbsp;|&nbsp; Music by Amirhossein Eftekhari, K. Kasyanov &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </span>
           <span className="start-screen__credits-text" aria-hidden="true">
-            Code by a Grumpy Norwegian &nbsp;|&nbsp; Graphics by a Grumpy Norwegian &nbsp;|&nbsp; Sound effects by some guy on the internet (sorry) &nbsp;|&nbsp; Music by K. Kasyanov &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Code by a Grumpy Norwegian &nbsp;|&nbsp; Graphics by a Grumpy Norwegian &nbsp;|&nbsp; Sound effects by some guy on the internet (sorry) &nbsp;|&nbsp; Music by Amirhossein Eftekhari, K. Kasyanov &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </span>
         </div>
       </div>
@@ -354,9 +419,13 @@ function StartScreen({ onStart }) {
         isOpen={showAbout} 
         onClose={() => setShowAbout(false)} 
       />
-      <ChangelogModal 
-        isOpen={showChangelog} 
-        onClose={() => setShowChangelog(false)} 
+      <ChangelogModal
+        isOpen={showChangelog}
+        onClose={() => setShowChangelog(false)}
+      />
+      <LeaderboardModal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
       />
     </div>
   )

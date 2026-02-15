@@ -1,42 +1,106 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useGame } from '../contexts/GameContext'
 import { audioManager } from '../utils/audioManager'
+import { checkIsTop10, addToLeaderboard } from '../utils/analytics'
+import { MOLE_CONFIG, MOLE_TYPES } from '../utils/moleTypes'
+import NicknamePrompt from './NicknamePrompt'
+import LeaderboardModal from './LeaderboardModal'
 import './GameOverScreen.css'
 
 // Import victory assets
 import victoryBackground from '../assets/victory/victory-background.jpg'
 import iranFlag from '../assets/victory/iran-flag.png'
 
+// Import mole sprites for stats breakdown
+import moleCommon from '../assets/sprites/moles/common/mole-common.png'
+import moleRare from '../assets/sprites/moles/rare/mole-rare.png'
+import moleGolden from '../assets/sprites/moles/golden/mole-golden.png'
+
+const catSprites = import.meta.glob('../assets/sprites/moles/cat/*.png', { eager: true, import: 'default' })
+const moleCat = catSprites['../assets/sprites/moles/cat/mole-cat.png'] || moleCommon
+
+const MOLE_SPRITES = {
+  [MOLE_TYPES.COMMON]: moleCommon,
+  [MOLE_TYPES.RARE]: moleRare,
+  [MOLE_TYPES.GOLDEN]: moleGolden,
+  [MOLE_TYPES.CAT]: moleCat,
+}
+
 function GameOverScreen({ onPlayAgain, onMainMenu }) {
-  const { score, highScore, previousHighScore, audioEnabled } = useGame()
+  const {
+    score, highScore, previousHighScore, audioEnabled,
+    currentLevel, gameStats, personalBests, updatePersonalBests,
+    nickname, setNickname,
+  } = useGame()
   const isNewHighScore = score > previousHighScore
   const [showContent, setShowContent] = useState(false)
+  const [showNicknamePrompt, setShowNicknamePrompt] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [leaderboardChecked, setLeaderboardChecked] = useState(false)
+  const leaderboardSubmittedRef = useRef(false)
+
+  // Calculate stats
+  const accuracy = gameStats.totalHits + gameStats.totalMisses > 0
+    ? Math.round((gameStats.totalHits / (gameStats.totalHits + gameStats.totalMisses)) * 100)
+    : 0
+
+  // Check what personal bests were broken
+  const newBests = {
+    bestScore: score > personalBests.bestScore,
+    bestAccuracy: accuracy > personalBests.bestAccuracy,
+    bestCombo: gameStats.maxCombo > personalBests.bestCombo,
+    highestLevel: currentLevel > personalBests.highestLevel,
+  }
+
+  // Update personal bests on mount
+  useEffect(() => {
+    updatePersonalBests({
+      score,
+      accuracy,
+      maxCombo: gameStats.maxCombo,
+      level: currentLevel,
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Check leaderboard eligibility
+  useEffect(() => {
+    if (leaderboardChecked) return
+    setLeaderboardChecked(true)
+
+    checkIsTop10(score).then((isTop10) => {
+      if (!isTop10) return
+
+      if (nickname) {
+        // Auto-submit with saved nickname
+        if (!leaderboardSubmittedRef.current) {
+          leaderboardSubmittedRef.current = true
+          addToLeaderboard(nickname, score, currentLevel)
+        }
+      } else {
+        setShowNicknamePrompt(true)
+      }
+    })
+  }, [score, currentLevel, nickname, leaderboardChecked])
 
   // Start music and show content after delay
   useEffect(() => {
-    // Set audio state and start victory music
     audioManager.setEnabled(audioEnabled)
     audioManager.playMusic('victory', { loop: false, volume: 0.6 })
 
-    // Show content after 2 seconds
     const timer = setTimeout(() => {
       setShowContent(true)
     }, 2000)
 
-    // Cleanup: fade out music when component unmounts
     return () => {
       clearTimeout(timer)
-      // The audioManager will cancel this fade if playMusic is called again (e.g., StrictMode remount)
       audioManager.fadeOutMusic(500)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Keep audio manager in sync with audioEnabled setting
   useEffect(() => {
     audioManager.setEnabled(audioEnabled)
   }, [audioEnabled])
 
-  // Play additional highscore sound when content appears
   useEffect(() => {
     if (showContent && isNewHighScore) {
       audioManager.play('highscore')
@@ -53,8 +117,17 @@ function GameOverScreen({ onPlayAgain, onMainMenu }) {
     onMainMenu()
   }
 
+  const handleNicknameSubmit = (name) => {
+    setNickname(name)
+    setShowNicknamePrompt(false)
+    if (!leaderboardSubmittedRef.current) {
+      leaderboardSubmittedRef.current = true
+      addToLeaderboard(name, score, currentLevel)
+    }
+  }
+
   return (
-    <div 
+    <div
       className="game-over-screen"
       style={{ backgroundImage: `url(${victoryBackground})` }}
     >
@@ -65,9 +138,9 @@ function GameOverScreen({ onPlayAgain, onMainMenu }) {
       <div className={`game-over-screen__content ${showContent ? 'game-over-screen__content--visible' : ''}`}>
         {/* Iranian Flag */}
         <div className="game-over-screen__flag-container">
-          <img 
-            src={iranFlag} 
-            alt="Flag of Iran" 
+          <img
+            src={iranFlag}
+            alt="Flag of Iran"
             className="game-over-screen__flag"
           />
         </div>
@@ -76,7 +149,7 @@ function GameOverScreen({ onPlayAgain, onMainMenu }) {
           <h1 className="game-over-screen__title">You are victorious!</h1>
           <p className="game-over-screen__subtitle">You have defeated the evil islamic republic!</p>
         </div>
-        
+
         <div className="game-over-screen__score-section">
           <div className="game-over-screen__final-score">
             <span className="game-over-screen__label">Your Score</span>
@@ -92,9 +165,77 @@ function GameOverScreen({ onPlayAgain, onMainMenu }) {
             </span>
             {isNewHighScore && (
               <span className="game-over-screen__new-record" aria-live="assertive">
-                🎉 New High Score! 🎉
+                New High Score!
               </span>
             )}
+          </div>
+        </div>
+
+        {/* Game Stats */}
+        <div className="game-over-screen__stats-section">
+          <h3 className="game-over-screen__section-title">Game Stats</h3>
+          <div className="game-over-screen__stats-grid">
+            <div className="game-over-screen__stat-item">
+              <span className="game-over-screen__stat-label">Level Reached</span>
+              <span className="game-over-screen__stat-value">{currentLevel}</span>
+            </div>
+            <div className="game-over-screen__stat-item">
+              <span className="game-over-screen__stat-label">Accuracy</span>
+              <span className="game-over-screen__stat-value">{accuracy}%</span>
+            </div>
+            <div className="game-over-screen__stat-item">
+              <span className="game-over-screen__stat-label">Max Combo</span>
+              <span className="game-over-screen__stat-value">{gameStats.maxCombo}</span>
+            </div>
+          </div>
+
+          {/* Mole breakdown */}
+          <div className="game-over-screen__mole-breakdown">
+            {Object.entries(gameStats.hitsByType).map(([type, count]) => (
+              <div className="game-over-screen__mole-stat" key={type}>
+                <img
+                  src={MOLE_SPRITES[type]}
+                  alt={MOLE_CONFIG[type]?.name || type}
+                  className="game-over-screen__mole-sprite"
+                />
+                <span className="game-over-screen__mole-count">{count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Personal Bests */}
+        <div className="game-over-screen__bests-section">
+          <h3 className="game-over-screen__section-title">Personal Bests</h3>
+          <div className="game-over-screen__stats-grid">
+            <div className="game-over-screen__stat-item">
+              <span className="game-over-screen__stat-label">Best Score</span>
+              <span className="game-over-screen__stat-value">
+                {personalBests.bestScore.toLocaleString()}
+                {newBests.bestScore && <span className="game-over-screen__new-badge">New!</span>}
+              </span>
+            </div>
+            <div className="game-over-screen__stat-item">
+              <span className="game-over-screen__stat-label">Best Accuracy</span>
+              <span className="game-over-screen__stat-value">
+                {personalBests.bestAccuracy}%
+                {newBests.bestAccuracy && <span className="game-over-screen__new-badge">New!</span>}
+              </span>
+            </div>
+            <div className="game-over-screen__stat-item">
+              <span className="game-over-screen__stat-label">Best Combo</span>
+              <span className="game-over-screen__stat-value">
+                {personalBests.bestCombo}
+                {newBests.bestCombo && <span className="game-over-screen__new-badge">New!</span>}
+              </span>
+            </div>
+            <div className="game-over-screen__stat-item">
+              <span className="game-over-screen__stat-label">Highest Level</span>
+              <span className="game-over-screen__stat-value">
+                {personalBests.highestLevel}
+                {newBests.highestLevel && <span className="game-over-screen__new-badge">New!</span>}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -108,6 +249,13 @@ function GameOverScreen({ onPlayAgain, onMainMenu }) {
           </button>
           <button
             className="game-over-screen__button game-over-screen__button--secondary"
+            onClick={() => setShowLeaderboard(true)}
+            aria-label="View leaderboard"
+          >
+            Leaderboard
+          </button>
+          <button
+            className="game-over-screen__button game-over-screen__button--secondary"
             onClick={handleMainMenu}
             aria-label="Return to main menu"
           >
@@ -115,6 +263,20 @@ function GameOverScreen({ onPlayAgain, onMainMenu }) {
           </button>
         </div>
       </div>
+
+      {/* Nickname prompt for leaderboard */}
+      {showNicknamePrompt && (
+        <NicknamePrompt
+          defaultNickname={nickname}
+          onSubmit={handleNicknameSubmit}
+          onCancel={() => setShowNicknamePrompt(false)}
+        />
+      )}
+
+      <LeaderboardModal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+      />
     </div>
   )
 }

@@ -1,0 +1,65 @@
+.modal-content--leaderboard {
+  max-width: 480px;
+}
+
+.leaderboard__status {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.95rem;
+  padding: 2rem 0;
+}
+
+.leaderboard__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard__th {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(142, 174, 124, 0.2);
+}
+
+.leaderboard__th--name {
+  text-align: left;
+}
+
+.leaderboard__row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard__row:last-child {
+  border-bottom: none;
+}
+
+.leaderboard__td {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+}
+
+.leaderboard__rank {
+  font-weight: 700;
+  color: #8eae7c;
+  width: 2rem;
+}
+
+.leaderboard__name {
+  text-align: left;
+  font-weight: 500;
+}
+
+.leaderboard__score {
+  font-weight: 700;
+  color: #ffd700;
+}
+
+.leaderboard__level {
+  color: rgba(255, 255, 255, 0.6);
+}
