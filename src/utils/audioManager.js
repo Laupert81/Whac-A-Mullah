@@ -13,8 +13,8 @@ import catAppearSound from '../assets/sounds/cat-appear.mp3'
 import catHitSound from '../assets/sounds/cat-hit.mp3'
 import comboMilestoneSound from '../assets/sounds/combo-milestone.mp3'
 
-// Import victory music
-import victoryMusic from '../assets/victory/victory-music.mp3'
+// Victory music loaded from external storage (not bundled for copyright reasons)
+const victoryMusic = 'https://jhwcs60v8wnkkpkh.public.blob.vercel-storage.com/music/victory-music.mp3'
 
 class AudioManager {
   constructor() {
