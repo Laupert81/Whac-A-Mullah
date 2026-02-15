@@ -154,9 +154,9 @@ function GameScreen({ onGameOver }) {
         // Play appropriate sound
         audioManager.setEnabled(audioEnabled)
         if (milestone) {
-          // Play combo milestone sound (pitch increases with multiplier)
-          const pitchMap = { 1: 1.0, 1.5: 1.08, 2: 1.15, 3: 1.25 }
-          audioManager.play('combo-milestone', { playbackRate: pitchMap[currentMultiplier] || 1.0 })
+          // Play combo milestone sound (pitch increases with each milestone)
+          const pitchMap = { 5: 1.0, 10: 1.1, 15: 1.2, 20: 1.3, 25: 1.4 }
+          audioManager.play('combo-milestone', { playbackRate: pitchMap[milestone] || 1.5 })
 
           // Show milestone popup
           setMilestoneValue(milestone)

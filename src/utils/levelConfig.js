@@ -10,7 +10,7 @@ export function getLevelConfig(level) {
 
   return {
     duration: LEVEL_DURATION,
-    scoreThreshold: Math.round(500 * Math.pow(1.3, lvl - 1)),
+    scoreThreshold: Math.round(500 * Math.pow(1.5, lvl - 1)),
     spawnIntervalMin: Math.max(250, 600 - (lvl - 1) * 30),
     spawnIntervalMax: Math.max(450, 1200 - (lvl - 1) * 50),
     activeDurationMin: Math.max(400, 800 - (lvl - 1) * 30),

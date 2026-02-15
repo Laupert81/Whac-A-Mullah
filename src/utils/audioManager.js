@@ -21,6 +21,7 @@ class AudioManager {
     this.enabled = true
     this.audioContext = null
     this.sounds = new Map()
+    this.audioBuffers = new Map() // Decoded AudioBuffers for Web Audio API pitch shifting
     this.music = new Map() // For background music tracks
     this.currentMusic = null // Currently playing music
     this.currentMusicName = null // Name of currently playing track
@@ -100,16 +101,54 @@ class AudioManager {
   }
 
   /**
+   * Decode an audio file URL into an AudioBuffer for Web Audio API playback
+   * @param {string} name - Sound name key
+   * @param {string} url - URL of the audio file
+   */
+  decodeAudioBuffer(name, url) {
+    if (!this.audioContext) return
+    fetch(url)
+      .then((response) => response.arrayBuffer())
+      .then((arrayBuffer) => this.audioContext.decodeAudioData(arrayBuffer))
+      .then((audioBuffer) => {
+        this.audioBuffers.set(name, audioBuffer)
+      })
+      .catch((error) => {
+        console.warn(`Could not decode audio buffer for ${name}:`, error)
+      })
+  }
+
+  /**
+   * Play a decoded AudioBuffer with pitch control via Web Audio API
+   * @param {string} name - Sound name key
+   * @param {number} [playbackRate=1] - Pitch multiplier (>1 = higher pitch)
+   * @param {number} [volume=1] - Volume (0-1)
+   * @returns {boolean} Whether playback started
+   */
+  playBuffer(name, playbackRate = 1, volume = 1) {
+    const buffer = this.audioBuffers.get(name)
+    if (!buffer || !this.audioContext) return false
+
+    const source = this.audioContext.createBufferSource()
+    const gainNode = this.audioContext.createGain()
+    source.buffer = buffer
+    source.playbackRate.value = playbackRate
+    gainNode.gain.value = volume
+    source.connect(gainNode)
+    gainNode.connect(this.audioContext.destination)
+    source.start(0)
+    return true
+  }
+
+  /**
    * Play a cloned audio element (for concurrent playback on iOS)
    * @param {HTMLAudioElement} audio
    * @param {string} soundName
-   * @param {number} [playbackRate=1] - Pitch/speed multiplier
    */
-  playCloned(audio, soundName, playbackRate = 1) {
+  playCloned(audio, soundName) {
     // Clone the audio element for concurrent playback
     const clone = audio.cloneNode()
     clone.volume = audio.volume
-    clone.playbackRate = playbackRate
 
     // Clean up after playback
     clone.addEventListener('ended', () => {
@@ -145,18 +184,25 @@ class AudioManager {
 
     const playbackRate = options.playbackRate || 1
 
+    // If pitch shifting requested, use Web Audio API buffer for true pitch control
+    if (playbackRate !== 1 && this.audioBuffers.has(soundName)) {
+      const audio = this.sounds.get(soundName)
+      this.playBuffer(soundName, playbackRate, audio ? audio.volume : 1)
+      return
+    }
+
     // Special handling for hit sounds - randomly select from array
     if (soundName === 'hit' && this.hitSounds.length > 0) {
       const randomIndex = Math.floor(Math.random() * this.hitSounds.length)
       const audio = this.hitSounds[randomIndex]
-      this.playCloned(audio, soundName, playbackRate)
+      this.playCloned(audio, soundName)
       return
     }
 
     // Try to play actual audio file if loaded
     const audio = this.sounds.get(soundName)
     if (audio) {
-      this.playCloned(audio, soundName, playbackRate)
+      this.playCloned(audio, soundName)
       return
     }
 
@@ -353,6 +399,13 @@ audioManager.preload({
   'cat-hit': catHitSound,
   'combo-milestone': comboMilestoneSound,
 })
+
+// Lower cat sound volumes (they're louder than other effects)
+audioManager.sounds.get('cat-appear').volume = 0.5
+audioManager.sounds.get('cat-hit').volume = 0.5
+
+// Decode combo-milestone into AudioBuffer for pitch shifting via Web Audio API
+audioManager.decodeAudioBuffer('combo-milestone', comboMilestoneSound)
 
 // Initialize music tracks
 const introMusic = 'https://jhwcs60v8wnkkpkh.public.blob.vercel-storage.com/music/intro-music.mp3'
